@@ -1,502 +1,997 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="uk">
+
 <head>
-    <title>Darqie Character Sheet</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden; /* Щоб основний скрол був лише на контенті */
-        }
 
-        #app-header {
-            background-color: #2a2a2a;
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #3a3a3a;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 100;
-        }
+    <meta charset="UTF-8">
 
-        #app-header h1 {
-            margin: 0;
-            font-size: 1.4em;
-            color: #e0e0e0;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        #main-content {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            overflow: hidden; /* Важливо для внутрішнього скролінгу */
-        }
+    <title>Лист Персонажа</title>
 
-        #characterTabs {
-            display: flex;
-            flex-wrap: wrap;
-            background-color: #333;
-            padding: 5px 0;
-            border-bottom: 1px solid #444;
-            overflow-x: auto; /* Дозволяє горизонтальний скролінг вкладок */
-            flex-shrink: 0; /* Забороняє вкладкам стискатися */
-        }
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 
-        .character-tab {
-            background-color: #444;
-            color: #bbb;
-            padding: 8px 12px;
-            margin: 0 2px;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
-            white-space: nowrap; /* Запобігає переносу тексту */
-            display: flex;
-            align-items: center;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        .character-tab:hover {
-            background-color: #555;
-        }
+    <script src="main.js" defer></script>
 
-        .character-tab.active {
-            background-color: #007bff;
-            color: #fff;
-            font-weight: bold;
-        }
+    <style>
 
-        .character-tab .close-tab {
-            margin-left: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
+        body {
 
-        .character-tab .close-tab:hover {
-            color: #ff4d4d;
-        }
+            font-family: 'Roboto', sans-serif;
 
-        #characterSheetContainer {
-            padding: 15px;
-            overflow-y: auto; /* Дозволяє вертикальний скролінг для вмісту листа */
-            flex-grow: 1; /* Дозволяє контейнеру займати весь доступний простір */
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* Проміжок між основними секціями */
-        }
+            margin: 0;
 
-        .sheet-section {
-            background-color: #2a2a2a;
-            border: 1px solid #3a3a3a;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
+            padding: 20px;
 
-        h2 {
-            color: #007bff;
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
-        }
+            display: flex;
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 20px; /* Вертикальний та горизонтальний проміжок */
-        }
+            flex-direction: column;
 
-        .form-grid.abilities {
-            grid-template-columns: repeat(3, 1fr); /* 3 колонки для здібностей */
-            text-align: center;
-        }
+            align-items: stretch;
 
-        .form-group, .header-item {
-            display: flex;
-            flex-direction: column;
-        }
+            min-height: 100vh;
 
-        label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #ccc;
-            font-size: 0.9em;
-        }
+            background-color: rgba(30, 34, 49, 0.1);
 
-        input[type="text"],
-        input[type="number"],
-        select {
-            background-color: #333;
-            border: 1px solid #555;
-            border-radius: 4px;
-            padding: 8px 10px;
-            color: #f0f0f0;
-            font-size: 1em;
-            width: calc(100% - 22px); /* З урахуванням padding та border */
-        }
+            color: #e0e0e0;
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
-        }
+            font-size: 16px;
 
-        /* Заголовок листа */
-        .sheet-header {
-            display: grid;
-            grid-template-columns: 2fr 1fr; /* Більше місця для імені, менше для фото */
-            gap: 15px;
-            align-items: start;
-        }
+            line-height: 1.4;
 
-        .header-main-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* для полів імені, класу, тощо */
-            gap: 10px 15px;
-        }
+            backdrop-filter: blur(20px);
 
-        .character-photo-upload {
-            width: 120px; /* Розмір квадрата */
-            height: 120px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.3); /* Пунктирна облямівка */
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative; /* Для позиціонування іконки */
-            overflow: hidden; /* Щоб зображення не виходило за межі */
-            margin-top: 10px; /* Відступ від попереднього блоку */
-            flex-shrink: 0; /* Не дозволяємо стискатися */
-            flex-grow: 0;
-        }
+            -webkit-backdrop-filter: blur(20px);
 
-        .character-photo-upload i {
-            font-size: 3em;
-            color: rgba(255, 255, 255, 0.4);
-            position: absolute; /* Щоб плюс був по центру */
-            pointer-events: none; /* Щоб клік проходив крізь іконку */
-        }
+            position: relative;
 
-        .character-photo-preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Зображення буде покривати весь простір, обрізаючи зайве */
-            border-radius: 5px;
-            display: none; /* За замовчуванням приховано */
-        }
-
-        /* Кнопка налаштувань фото (шестерня) */
-        .photo-settings {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            color: #fff;
-            font-size: 1.2em;
-            z-index: 2; /* Щоб була над фото */
-            display: none; /* Приховано за замовчуванням */
-        }
-
-        .photo-settings:hover {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #333;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
-            z-index: 1;
-            right: 0;
-            top: 35px; /* Розташовуємо під кнопкою */
-            border-radius: 5px;
-            overflow: hidden; /* Для округлих країв */
-        }
-
-        .dropdown-content button {
-            color: #f0f0f0;
-            padding: 10px 12px;
-            text-decoration: none;
-            display: block;
-            background: none;
-            border: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        .dropdown-content button:hover {
-            background-color: #007bff;
-        }
+        }
 
 
-        .ability {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
 
-        .ability .score-input {
-            width: 60px;
-            text-align: center;
-            margin-bottom: 5px;
-        }
+        .character-controls {
 
-        .ability .modifier {
-            font-weight: bold;
-            color: #007bff;
-        }
+            display: flex;
 
-        /* Кнопки керування листами */
-        .sheet-controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 10px;
-            background-color: #2a2a2a;
-            border-top: 1px solid #3a3a3a;
-            flex-shrink: 0; /* Забороняє кнопкам стискатися */
-        }
+            justify-content: space-between;
 
-        .sheet-controls button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease;
-        }
+            align-items: center;
 
-        .sheet-controls button:hover {
-            background-color: #0056b3;
-        }
+            margin-bottom: 15px;
 
-        .sheet-controls button.delete-btn {
-            background-color: #dc3545;
-        }
+            gap: 10px;
 
-        .sheet-controls button.delete-btn:hover {
-            background-color: #c82333;
-        }
-    </style>
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .character-tabs {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 5px;
+
+            flex-grow: 1;
+
+        }
+
+
+
+        .character-tab {
+
+            background-color: rgba(255, 255, 255, 0.1);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            border-radius: 5px;
+
+            padding: 5px 10px;
+
+            cursor: pointer;
+
+            font-size: 0.9em;
+
+            transition: background-color 0.2s, border-color 0.2s;
+
+            position: relative;
+
+            display: flex; /* Для вирівнювання тексту і хрестика */
+
+            align-items: center;
+
+        }
+
+
+
+        .character-tab:hover {
+
+            background-color: rgba(255, 255, 255, 0.15);
+
+        }
+
+
+
+        .character-tab.active {
+
+            background-color: #4CAF50;
+
+            border-color: #4CAF50;
+
+            color: white;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .character-tab .close-tab {
+
+            margin-left: 8px;
+
+            color: rgba(255, 255, 255, 0.7);
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            font-size: 0.9em;
+
+        }
+
+
+
+        .character-tab .close-tab:hover {
+
+            color: #ff4d4d;
+
+        }
+
+
+
+        /* Стилі для кнопок "+" та "-" */
+
+        #addCharacterButton, #deleteCharacterButton {
+
+            background-color: #4CAF50;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 50%;
+
+            width: 30px;
+
+            height: 30px;
+
+            font-size: 20px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            cursor: pointer;
+
+            transition: background-color 0.2s;
+
+            flex-shrink: 0;
+
+            margin-left: 5px;
+
+            font-weight: bold; /* Для жирнішого "+" */
+
+        }
+
+
+
+        #addCharacterButton:hover {
+
+            background-color: #45a049;
+
+        }
+
+
+
+        #deleteCharacterButton {
+
+            background-color: #f44336; /* Червона для видалення */
+
+            font-size: 24px; /* Трохи більший для "-" */
+
+            line-height: 1; /* Вирівнювання по центру */
+
+            padding-bottom: 2px; /* Коригування позиції "-" */
+
+        }
+
+
+
+        #deleteCharacterButton:hover {
+
+            background-color: #d32f2f;
+
+        }
+
+
+
+        #characterSheetContainer {
+
+            flex-grow: 1;
+
+            display: flex;
+
+            flex-direction: column;
+
+            width: 100%;
+
+            overflow-y: auto;
+
+            padding-right: 5px;
+
+        }
+
+
+
+        .character-sheet {
+
+            display: flex;
+
+            flex-direction: column;
+
+            width: 100%;
+
+        }
+
+
+
+        .block {
+
+            background-color: rgba(255, 255, 255, 0.05);
+
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            border-radius: 5px;
+
+            padding: 10px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        .header-block {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 15px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .header-item {
+
+            flex-grow: 1;
+
+            padding: 5px;
+
+            background-color: rgba(255, 255, 255, 0.05);
+
+            border-radius: 3px;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        .header-item label {
+
+            font-size: 0.8em;
+
+            color: #b0b0b0;
+
+            margin-bottom: 3px;
+
+        }
+
+
+
+        .header-item input[type="text"],
+
+        .header-item input[type="number"],
+
+        .header-item select,
+
+        .ability input, .hp-item input {
+
+            width: 100%;
+
+            padding: 5px;
+
+            background-color: rgba(255, 255, 255, 0.1);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            border-radius: 3px;
+
+            color: #e0e0e0;
+
+            font-size: 1em;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        .header-item input[type="text"]:focus,
+
+        .header-item input[type="number"]:focus,
+
+        .header-item select:focus,
+
+        .ability input:focus, .hp-item input:focus {
+
+            outline: none;
+
+            border-color: #4CAF50;
+
+        }
+
+
+
+        /* Стилі для блоку завантаження фото */
+
+        .character-photo-upload {
+
+            width: 120px; /* Розмір квадрата */
+
+            height: 120px;
+
+            background-color: rgba(255, 255, 255, 0.05);
+
+            border: 1px dashed rgba(255, 255, 255, 0.3); /* Пунктирна облямівка */
+
+            border-radius: 5px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            cursor: pointer;
+
+            position: relative; /* Для позиціонування іконки */
+
+            overflow: hidden; /* Щоб зображення не виходило за межі */
+
+            margin-top: 10px; /* Відступ від попереднього блоку */
+
+            flex-shrink: 0; /* Не дозволяємо стискатися */
+
+            flex-grow: 0;
+
+        }
+
+
+
+        .character-photo-upload .fa-plus {
+
+            font-size: 48px;
+
+            color: rgba(255, 255, 255, 0.4);
+
+        }
+
+
+
+        .character-photo-upload:hover {
+
+            background-color: rgba(255, 255, 255, 0.1);
+
+            border-color: rgba(255, 255, 255, 0.4);
+
+        }
+
+
+
+        .character-photo-upload img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover; /* Обрізаємо зображення, щоб воно заповнювало квадрат */
+
+            display: none; /* Приховуємо за замовчуванням */
+
+        }
+
+
+
+        .photo-settings {
+
+            position: absolute;
+
+            top: 5px;
+
+            right: 5px;
+
+            background-color: rgba(0, 0, 0, 0.6);
+
+            border-radius: 50%;
+
+            width: 25px;
+
+            height: 25px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            cursor: pointer;
+
+            color: white;
+
+            font-size: 14px;
+
+            display: none; /* Приховано за замовчуванням */
+
+            z-index: 10; /* Щоб була поверх зображення */
+
+        }
+
+
+
+        .photo-settings:hover {
+
+            background-color: rgba(0, 0, 0, 0.8);
+
+        }
+
+
+
+        .photo-settings .dropdown-content {
+
+            position: absolute;
+
+            top: 100%; /* Під кнопкою */
+
+            right: 0;
+
+            background-color: #333;
+
+            min-width: 120px;
+
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
+
+            z-index: 1;
+
+            border-radius: 5px;
+
+            overflow: hidden;
+
+            display: none; /* Приховано за замовчуванням */
+
+        }
+
+
+
+        .photo-settings .dropdown-content button {
+
+            color: white;
+
+            padding: 8px 12px;
+
+            text-decoration: none;
+
+            display: block;
+
+            background: none;
+
+            border: none;
+
+            width: 100%;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            font-size: 0.9em;
+
+        }
+
+
+
+        .photo-settings .dropdown-content button:hover {
+
+            background-color: #555;
+
+        }
+
+
+
+        .ability-scores {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 15px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .ability {
+
+            flex: 1;
+
+            min-width: 80px;
+
+            text-align: center;
+
+            background-color: rgba(255, 255, 255, 0.05);
+
+            border-radius: 3px;
+
+            padding: 5px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+        }
+
+
+
+        .ability div:first-child {
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+        .ability .modifier {
+
+            font-size: 0.9em;
+
+            color: #b0b0b0;
+
+        }
+
+        .ability input.score-input {
+
+            width: calc(100% - 10px);
+
+            margin-top: 5px;
+
+            font-size: 1.1em;
+
+            font-weight: bold;
+
+        }
+
+
+
+        .hp-block {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 15px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .hp-item {
+
+            flex: 1;
+
+            min-width: 100px;
+
+            text-align: center;
+
+            background-color: rgba(255, 255, 255, 0.05);
+
+            border-radius: 3px;
+
+            padding: 5px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+        }
+
+        .hp-item div:first-child {
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+
+        }
+
+        .hp-item input {
+
+            font-size: 1.1em;
+
+            font-weight: bold;
+
+            margin-top: 5px;
+
+        }
+
+
+
+        h2 {
+
+            font-size: 1.2em;
+
+            margin-top: 0;
+
+            margin-bottom: 10px;
+
+            color: #fff;
+
+        }
+
+    </style>
+
 </head>
+
 <body>
-    <div id="app-header">
-        <h1>Darqie Character Sheet</h1>
-    </div>
 
-    <div id="main-content">
-        <div id="characterTabs">
-            </div>
+    <div class="character-controls">
 
-        <div id="characterSheetContainer">
-            <div class="sheet-section sheet-header">
-                <div class="header-main-info">
-                    <div class="form-group">
-                        <label for="characterName">Ім'я персонажа</label>
-                        <input type="text" id="characterName" placeholder="Введіть ім'я">
-                    </div>
-                    <div class="form-group">
-                        <label for="characterClassLevel">Клас та Рівень</label>
-                        <input type="text" id="characterClassLevel" placeholder="Воїн 3">
-                    </div>
-                    <div class="form-group">
-                        <label for="background">Передісторія</label>
-                        <input type="text" id="background" placeholder="Солдат">
-                    </div>
-                    <div class="form-group">
-                        <label for="playerName">Ім'я гравця</label>
-                        <input type="text" id="playerName" placeholder="Ваше ім'я">
-                    </div>
-                    <div class="header-item">
-                        <label for="characterRace">Раса</label>
-                        <select id="characterRace">
-                            <option value="">Оберіть расу</option>
-                            <option value="human">Людина</option>
-                            <option value="elf">Ельф</option>
-                            <option value="dwarf">Гном</option>
-                            <option value="halfling">Гафлінг</option>
-                            <option value="dragonborn">Драконороджений</option>
-                            <option value="gnome">Гном</option>
-                            <option value="half-elf">Напівельф</option>
-                            <option value="half-orc">Напіворк</option>
-                            <option value="tiefling">Тіфлінг</option>
-                            <option value="aarakocra">Ааракокра</option>
-                            <option value="genasi">Генасі</option>
-                            <option value="goliath">Голіаф</option>
-                            <option value="lizardfolk">Ящер</option>
-                            <option value="tabaxi">Табаксі</option>
-                            <option value="kenku">Кенку</option>
-                            <option value="firbolg">Фірболг</option>
-                            <option value="gith">Гіт</option>
-                            <option value="yuan-ti">Юань-ті</option>
-                            <option value="bugbear">Багбір</option>
-                            <option value="goblin">Гоблін</option>
-                            <option value="hobgoblin">Хобгоблін</option>
-                            <option value="kobold">Кобольд</option>
-                            <option value="orc">Орк</option>
-                            <option value="grung">Ґрунґ</option>
-                            <option value="tortle">Тортл</option>
-                            <option value="leonin">Леонін</option>
-                            <option value="satyr">Сатир</option>
-                            <option value="changeling">Ченджлінг</option>
-                            <option value="kalashtar">Калаштар</option>
-                            <option value="shifter">Шифтер</option>
-                            <option value="warforged">Варфорджд</option>
-                            <option value="vedalken">Ведалкен</option>
-                            <option value="loxodon">Локсодон</option>
-                            <option value="simic-hybrid">Симік-гібрид</option>
-                            <option value="centaur">Кентавр</option>
-                            <option value="minotaur">Мінотавр</option>
-                            <option value="verdan">Вердан</option>
-                            <option value="locathah">Локатах</option>
-                            <option value="grung">Ґрунґ</option>
-                            <option value="owlin">Аулін</option>
-                            <option value="plasmoid">Плазмоїд</option>
-                            <option value="thri-kreen">Трі-крін</option>
-                            <option value="autognome">Автогном</option>
-                            <option value="fairy">Фея</option>
-                            <option value="harengon">Харенгон</option>
-                            <option value="kender">Кендер</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="alignment">Світогляд</label>
-                        <input type="text" id="alignment" placeholder="Законно-Добрий">
-                    </div>
-                    <div class="form-group">
-                        <label for="experiencePoints">Досвід</label>
-                        <input type="number" id="experiencePoints" value="0">
-                    </div>
-                </div>
+        <div class="character-tabs" id="characterTabs">
 
-                <div class="photo-section">
-                    <div id="characterPhotoUpload" class="character-photo-upload">
-                        <img id="characterPhotoPreview" class="character-photo-preview" src="" alt="Character Photo">
-                        <i class="fas fa-plus"></i>
-                        <button id="photoSettingsButton" class="photo-settings">
-                            <i class="fas fa-cog"></i>
-                            <div class="dropdown-content">
-                                <button id="replacePhotoButton">Замінити фото</button>
-                                <button id="removePhotoButton">Видалити фото</button>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            </div>
 
-            <div class="sheet-section">
-                <h2>Характеристики</h2>
-                <div class="form-grid abilities">
-                    <div class="ability">
-                        <label for="strengthScore">Сила</label>
-                        <input type="number" id="strengthScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                    <div class="ability">
-                        <label for="dexterityScore">Спритність</label>
-                        <input type="number" id="dexterityScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                    <div class="ability">
-                        <label for="constitutionScore">Статура</label>
-                        <input type="number" id="constitutionScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                    <div class="ability">
-                        <label for="intelligenceScore">Інтелект</label>
-                        <input type="number" id="intelligenceScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                    <div class="ability">
-                        <label for="wisdomScore">Мудрість</label>
-                        <input type="number" id="wisdomScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                    <div class="ability">
-                        <label for="charismaScore">Харизма</label>
-                        <input type="number" id="charismaScore" class="score-input" value="10">
-                        <div class="modifier">(+0)</div>
-                    </div>
-                </div>
-            </div>
+        <button id="addCharacterButton">+</button>
 
-            <div class="sheet-section">
-                <h2>Здоров'я</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="maxHp">Макс. ХП</label>
-                        <input type="number" id="maxHp" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label for="currentHp">Поточні ХП</label>
-                        <input type="number" id="currentHp" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label for="tempHp">Тимчасові ХП</label>
-                        <input type="number" id="tempHp" value="0">
-                    </div>
-                </div>
-            </div>
+        <button id="deleteCharacterButton">-</button>
 
-            <div class="sheet-section">
-                <h2>Кидки Рятунку</h2>
-                <p>Тут будуть поля для кидків рятунку.</p>
-            </div>
-            <div class="sheet-section">
-                <h2>Навички</h2>
-                <p>Тут будуть поля для навичок.</p>
-            </div>
-            <div class="sheet-section">
-                <h2>Зброя та Атаки</h2>
-                <p>Тут будуть поля для зброї та атак.</p>
-            </div>
-            <div class="sheet-section">
-                <h2>Спорядження</h2>
-                <p>Тут будуть поля для спорядження.</p>
-            </div>
-            <div class="sheet-section">
-                <h2>Особливості та Риси</h2>
-                <p>Тут будуть поля для особливостей та рис.</p>
-            </div>
-            <div class="sheet-section">
-                <h2>Нотатки</h2>
-                <textarea style="width: calc(100% - 22px); height: 100px; background-color: #333; border: 1px solid #555; border-radius: 4px; padding: 8px 10px; color: #f0f0f0; font-size: 1em;" placeholder="Додайте ваші нотатки..."></textarea>
-            </div>
+    </div>
 
-        </div>
-    </div>
 
-    <div class="sheet-controls">
-        <button id="addCharacterButton"><i class="fas fa-plus"></i> Додати лист</button>
-        <button id="deleteCharacterButton" class="delete-btn"><i class="fas fa-minus"></i> Видалити активний лист</button>
-    </div>
 
-    <script src="main.js"></script>
+    <div id="characterSheetContainer">
+
+        <div class="character-sheet" id="characterSheetTemplate">
+
+            <div class="header-block">
+
+                <div class="header-item">
+
+                    <label for="characterName">Назва Персонажа</label>
+
+                    <input type="text" id="characterName" placeholder="Введіть назву персонажа">
+
+                </div>
+
+                <div class="header-item">
+
+                    <label for="characterClassLevel">Клас & Рівень</label>
+
+                    <input type="text" id="characterClassLevel" placeholder="Введіть клас та рівень">
+
+                </div>
+
+                <div class="header-item">
+
+                    <label for="background">Передісторія</label>
+
+                    <input type="text" id="background" placeholder="Введіть передісторію">
+
+                </div>
+
+                <div class="header-item">
+
+                    <label for="playerName">Ім'я Гравця</label>
+
+                    <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="header-block">
+
+                <div class="header-item">
+
+                    <label for="characterRace">Раса</label>
+
+                    <select id="characterRace">
+
+                        <option value="">Оберіть расу</option>
+
+                        <option value="human">Людина</option>
+
+                        <option value="elf">Ельф</option>
+
+                        <option value="dwarf">Гном</option>
+
+                        <option value="halfling">Гафлінг</option>
+
+                        <option value="dragonborn">Драконороджений</option>
+
+                        <option value="gnome">Гном</option>
+
+                        <option value="half-elf">Напівельф</option>
+
+                        <option value="half-orc">Напіворк</option>
+
+                        <option value="tiefling">Тіфлінг</option>
+
+                        <option value="aarakocra">Ааракокра</option>
+
+                        <option value="genasi">Генасі</option>
+
+                        <option value="goliath">Голіаф</option>
+
+                        <option value="lizardfolk">Ящер</option>
+
+                        <option value="tabaxi">Табаксі</option>
+
+                        <option value="kenku">Кенку</option>
+
+                        <option value="firbolg">Фірболг</option>
+
+                        <option value="gith">Гіт</option>
+
+                        <option value="yuan-ti">Юань-ті</option>
+
+                        <option value="bugbear">Багбір</option>
+
+                        <option value="goblin">Гоблін</option>
+
+                        <option value="hobgoblin">Хобгоблін</option>
+
+                        <option value="kobold">Кобольд</option>
+
+                        <option value="orc">Орк</option>
+
+                        <option value="grung">Ґрунґ</option>
+
+                        <option value="tortle">Тортл</option>
+
+                        <option value="leonin">Леонін</option>
+
+                        <option value="satyr">Сатир</option>
+
+                        <option value="changeling">Ченджлінг</option>
+
+                        <option value="kalashtar">Калаштар</option>
+
+                        <option value="shifter">Шифтер</option>
+
+                        <option value="warforged">Варфорджд</option>
+
+                        <option value="vedalken">Ведалкен</option>
+
+                        <option value="loxodon">Локсодон</option>
+
+                        <option value="simic-hybrid">Симік-гібрид</option>
+
+                        <option value="centaur">Кентавр</option>
+
+                        <option value="minotaur">Мінотавр</option>
+
+                        <option value="verdan">Вердан</option>
+
+                        <option value="locathah">Локатах</option>
+
+                        <option value="grung">Ґрунґ</option>
+
+                        <option value="owlin">Аулін</option>
+
+                        <option value="plasmoid">Плазмоїд</option>
+
+                        <option value="thri-kreen">Трі-крін</option>
+
+                        <option value="autognome">Автогном</option>
+
+                        <option value="fairy">Фея</option>
+
+                        <option value="harengon">Харенгон</option>
+
+                        <option value="kender">Кендер</option>
+
+                    </select>
+
+                </div>
+
+                <div class="header-item">
+
+                    <label for="alignment">Світогляд</label>
+
+                    <input type="text" id="alignment" placeholder="Введіть світогляд">
+
+                </div>
+
+                <div class="header-item">
+
+                    <label for="experiencePoints">Досвід</label>
+
+                    <input type="number" id="experiencePoints" placeholder="0">
+
+                </div>
+
+            </div>
+
+            <div class="character-photo-upload" id="characterPhotoUpload">
+
+                <i class="fas fa-plus"></i>
+
+                <img id="characterPhotoPreview" src="" alt="Фото персонажа">
+
+                <div class="photo-settings" id="photoSettingsButton">
+
+                    <i class="fas fa-cog"></i>
+
+                    <div class="dropdown-content">
+
+                        <button id="replacePhotoButton">Замінити фото</button>
+
+                        <button id="removePhotoButton">Видалити фото</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="ability-scores">
+
+                <div class="ability">
+
+                    <div>СИЛА</div>
+
+                    <input type="number" class="score-input" id="strengthScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+                <div class="ability">
+
+                    <div>СПРИТНІСТЬ</div>
+
+                    <input type="number" class="score-input" id="dexterityScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+                <div class="ability">
+
+                    <div>СТАТУРА</div>
+
+                    <input type="number" class="score-input" id="constitutionScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+                <div class="ability">
+
+                    <div>ІНТЕЛЕКТ</div>
+
+                    <input type="number" class="score-input" id="intelligenceScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+                <div class="ability">
+
+                    <div>МУДРІСТЬ</div>
+
+                    <input type="number" class="score-input" id="wisdomScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+                <div class="ability">
+
+                    <div>ХАРИЗМА</div>
+
+                    <input type="number" class="score-input" id="charismaScore" value="10">
+
+                    <div class="modifier">(+0)</div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="hp-block">
+
+                <div class="hp-item">
+
+                    <div>МАКСИМУМ HP</div>
+
+                    <input type="number" id="maxHp" value="10">
+
+                </div>
+
+                <div class="hp-item">
+
+                    <div>ПОТОЧНІ HP</div>
+
+                    <input type="number" id="currentHp" value="10">
+
+                </div>
+
+                <div class="hp-item">
+
+                    <div>ТИМЧАСОВІ HP</div>
+
+                    <input type="number" id="tempHp" value="0">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
+
+            <div class="block"><h2>НАВИЧКИ</h2></div>
+
+            <div class="block"><h2>ЗБРОЯ</h2></div>
+
+            <div class="block"><h2>СПОСОБИ АТАКИ</h2></div>
+
+            <div class="block"><h2>ОСОБЛИВОСТІ ТА РИСИ</h2></div>
+
+            <div class="block"><h2>СНАРЯДЖЕННЯ</h2></div>
+
+            <div class="block"><h2>НОТАТКИ</h2></div>
+
+        </div>
+
+    </div>
+
 </body>
+
 </html>
