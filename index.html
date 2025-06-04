@@ -5,267 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лист Персонажа</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="style.css"> 
+    
+    <script src="/owlbear-rodeo-sdk.js"></script> 
     <script src="main.js" defer></script>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            min-height: 100vh;
-            background-color: rgba(30, 34, 49, 0.1);
-            color: #e0e0e0;
-            font-size: 16px;
-            line-height: 1.4;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            position: relative;
-        }
-
-        .character-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .character-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            flex-grow: 1;
-        }
-
-        .character-tab {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.2s, border-color 0.2s;
-            position: relative; /* Для позиціонування кнопки видалення на вкладці */
-        }
-
-        .character-tab:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .character-tab.active {
-            background-color: #4CAF50;
-            border-color: #4CAF50;
-            color: white;
-            font-weight: bold;
-        }
-
-        .character-tab .close-tab {
-            margin-left: 8px;
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .character-tab .close-tab:hover {
-            color: #ff4d4d; /* Червоний при наведенні */
-        }
-
-        #addCharacterButton, #deleteCharacterButton {
-            background-color: #4CAF50; /* Зелена для додавання */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            flex-shrink: 0;
-            margin-left: 5px; /* Невеликий відступ від вкладок */
-        }
-
-        #addCharacterButton:hover {
-            background-color: #45a049;
-        }
-
-        #deleteCharacterButton {
-            background-color: #f44336; /* Червона для видалення */
-        }
-
-        #deleteCharacterButton:hover {
-            background-color: #d32f2f;
-        }
-
-
-        #characterSheetContainer {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .character-sheet {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        .block {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .header-block {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .header-item {
-            flex-grow: 1;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header-item label {
-            font-size: 0.8em;
-            color: #b0b0b0;
-            margin-bottom: 3px;
-        }
-
-        .header-item input[type="text"],
-        .header-item input[type="number"],
-        .header-item select,
-        .ability input, .hp-item input {
-            width: 100%;
-            padding: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            color: #e0e0e0;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        .header-item input[type="text"]:focus,
-        .header-item input[type="number"]:focus,
-        .header-item select:focus,
-        .ability input:focus, .hp-item input:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-
-        /* Стилі для поля посилання на фото */
-        .character-photo-item {
-            flex-basis: 100%; /* Займає всю ширину */
-            margin-top: 10px; /* Відступ зверху */
-        }
-        .character-photo-item img {
-            max-width: 100px; /* Розмір прев'ю фото */
-            max-height: 100px;
-            border-radius: 5px;
-            object-fit: cover;
-            margin-top: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-
-        .ability-scores {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .ability {
-            flex: 1;
-            min-width: 80px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .ability div:first-child {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .ability .modifier {
-            font-size: 0.9em;
-            color: #b0b0b0;
-        }
-        .ability input.score-input {
-            width: calc(100% - 10px);
-            margin-top: 5px;
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        .hp-block {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .hp-item {
-            flex: 1;
-            min-width: 100px;
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .hp-item div:first-child {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .hp-item input {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        h2 {
-            font-size: 1.2em;
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-    </style>
 </head>
 <body>
     <div class="character-controls">
         <div class="character-tabs" id="characterTabs">
-            </div>
+        </div>
         <button id="addCharacterButton">+</button>
         <button id="deleteCharacterButton">Видалити</button>
     </div>
 
     <div id="characterSheetContainer">
-        <div class="character-sheet" id="characterSheetTemplate">
+        <div class="character-sheet" id="characterSheetTemplate" style="display: none;"> 
             <div class="header-block">
                 <div class="header-item">
                     <label for="characterName">Назва Персонажа</label>
@@ -357,32 +111,32 @@
                 <div class="ability">
                     <div>СИЛА</div>
                     <input type="number" class="score-input" id="strengthScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="strengthModifier">(+0)</div>
                 </div>
                 <div class="ability">
                     <div>СПРИТНІСТЬ</div>
                     <input type="number" class="score-input" id="dexterityScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="dexterityModifier">(+0)</div>
                 </div>
                 <div class="ability">
                     <div>СТАТУРА</div>
                     <input type="number" class="score-input" id="constitutionScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="constitutionModifier">(+0)</div>
                 </div>
                 <div class="ability">
                     <div>ІНТЕЛЕКТ</div>
                     <input type="number" class="score-input" id="intelligenceScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="intelligenceModifier">(+0)</div>
                 </div>
                 <div class="ability">
                     <div>МУДРІСТЬ</div>
                     <input type="number" class="score-input" id="wisdomScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="wisdomModifier">(+0)</div>
                 </div>
                 <div class="ability">
                     <div>ХАРИЗМА</div>
                     <input type="number" class="score-input" id="charismaScore" value="10">
-                    <div class="modifier">(+0)</div>
+                    <div class="modifier" id="charismaModifier">(+0)</div>
                 </div>
             </div>
 
