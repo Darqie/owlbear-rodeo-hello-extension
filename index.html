@@ -10,18 +10,24 @@
       body {
         font-family: 'Roboto', sans-serif;
         margin: 0;
-        padding: 20px;
+
         display: flex;
-        flex-direction: column; /* Додано: для кращого розташування елементів по вертикалі */
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        background-color: rgba(0, 0, 0, 0.3); /* Змінено: Напівпрозорий чорний фон */
+        min-height: 100vh; /* Popover буде займати всю доступну висоту */
         color: #e0e0e0;
         font-size: 24px;
         text-align: center;
-        backdrop-filter: blur(10px); /* Додано: Ефект розмиття */
-        -webkit-backdrop-filter: blur(10px); /* Додано: Для підтримки в Safari */
+
+        /* ВАШІ НОВІ СТИЛІ ДЛЯ POPUP ФОНУ */
+        background-color: #ffffff80; /* Білий (~50% прозорості). Це колір *самого* popover. */
+        border-radius: 16px; /* Заокруглені кути */
+        background-clip: padding-box;
+        border: 2px solid transparent; /* Прозора рамка */
+
+        backdrop-filter: blur(10px); /* Можна налаштувати інтенсивність розмиття */
+        -webkit-backdrop-filter: blur(10px); /* Для підтримки в Safari */
       }
 
       /* Додамо базові стилі для майбутніх елементів, якщо вони будуть */
