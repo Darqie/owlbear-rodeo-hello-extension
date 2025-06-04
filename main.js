@@ -211,7 +211,7 @@ function deleteCharacterSheet() {
     }
 }
 
-// Функція для видалення листа за індексом (викликається з вкладки) - ЦЮ ФУНКЦІЮ БІЛЬШЕ НЕ ВИКОРИСТОВУЄМО
+// Функція для видалення листа за індексом (викликається з вкладки)
 function deleteCharacterSheetByIndex(indexToDelete) {
     if (characterSheets.length === 1) { // Якщо залишився лише один лист
         alert('Не можна видалити останній лист. Якщо ви хочете очистити його, ви можете просто видалити дані.');
@@ -256,14 +256,17 @@ function updateCharacterTabs() {
         if (index === activeSheetIndex) {
             tab.classList.add('active');
         }
-        // Встановлюємо текст вкладки (ім'я персонажа або дефолтне)
-        const tabText = document.createElement('span');
-        tabText.textContent = sheet.characterName || `Персонаж ${index + 1}`;
-        tab.appendChild(tabText);
-
+        tab.textContent = sheet.characterName || `Персонаж ${index + 1}`;
         tab.dataset.index = index;
 
-        // Видалено код для створення та додавання closeBtn (хрестика)
+        const closeBtn = document.createElement('span');
+        closeBtn.classList.add('close-tab');
+        closeBtn.textContent = 'x';
+        closeBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            deleteCharacterSheetByIndex(index);
+        });
+        tab.appendChild(closeBtn);
 
         tab.addEventListener('click', () => switchCharacterSheet(index));
         characterTabsContainer.appendChild(tab);
