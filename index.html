@@ -72,7 +72,17 @@
             font-weight: bold;
         }
 
-        /* CSS для видалення хрестика видалено */
+        .character-tab .close-tab {
+            margin-left: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .character-tab .close-tab:hover {
+            color: #ff4d4d;
+        }
 
         #characterSheetContainer {
             padding: 15px;
@@ -145,21 +155,11 @@
         }
 
         /* Заголовок листа */
-        /* Змінено, щоб розмістити характеристики всередині */
         .sheet-header {
             display: grid;
             grid-template-columns: 2fr 1fr; /* Більше місця для імені, менше для фото */
             gap: 15px;
             align-items: start;
-            /* Додаємо flex, щоб вміст всередині мав стовпчиковий напрямок */
-            flex-direction: column; /* Змінюємо напрямок на стовпчик */
-            gap: 15px; /* Забезпечуємо проміжок між підблоками */
-        }
-        /* Внутрішній сітковий макет для main-info і photo-section */
-        .header-top-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 15px;
         }
 
         .header-main-info {
@@ -169,18 +169,19 @@
         }
 
         .character-photo-upload {
-            width: 100%; /* Збільшуємо до ширини контейнера */
-            aspect-ratio: 16 / 9; /* Встановлюємо пропорційне співвідношення сторін (ширина до висоти) */
+            width: 120px; /* Розмір квадрата */
+            height: 120px;
             background-color: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border: 1px dashed rgba(255, 255, 255, 0.3); /* Пунктирна облямівка */
             border-radius: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            margin-top: 10px;
+            position: relative; /* Для позиціонування іконки */
+            overflow: hidden; /* Щоб зображення не виходило за межі */
+            margin-top: 10px; /* Відступ від попереднього блоку */
+            flex-shrink: 0; /* Не дозволяємо стискатися */
             flex-grow: 0;
         }
 
@@ -316,60 +317,102 @@
             </div>
 
         <div id="characterSheetContainer">
-            <div class="sheet-section">
-                <div class="header-top-grid"> <div class="header-main-info">
-                        <div class="form-group">
-                            <label for="characterName">Ім'я персонажа</label>
-                            <input type="text" id="characterName" placeholder="Введіть ім'я">
-                        </div>
-                        <div class="form-group">
-                            <label for="characterClassLevel">Клас та Рівень</label>
-                            <input type="text" id="characterClassLevel" placeholder="Воїн 3">
-                        </div>
-                        <div class="form-group">
-                            <label for="background">Передісторія</label>
-                            <input type="text" id="background" placeholder="Солдат">
-                        </div>
-                        <div class="form-group">
-                            <label for="playerName">Ім'я гравця</label>
-                            <input type="text" id="playerName" placeholder="Ваше ім'я">
-                        </div>
-                        <div class="header-item">
-                            <label for="characterRace">Раса</label>
-                            <select id="characterRace">
-                                <option value="">Оберіть расу</option>
-                                <option value="human">Людина</option>
-                                <option value="elf">Ельф</option>
-                                <option value="dwarf">Гном</option>
-                                <option value="halfling">Гафлінг</option>
-                                <option value="dragonborn">Драконороджений</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="alignment">Світогляд</label>
-                            <input type="text" id="alignment" placeholder="Законно-Добрий">
-                        </div>
-                        <div class="form-group">
-                            <label for="experiencePoints">Досвід</label>
-                            <input type="number" id="experiencePoints" value="0">
-                        </div>
+            <div class="sheet-section sheet-header">
+                <div class="header-main-info">
+                    <div class="form-group">
+                        <label for="characterName">Ім'я персонажа</label>
+                        <input type="text" id="characterName" placeholder="Введіть ім'я">
                     </div>
-
-                    <div class="photo-section">
-                        <div id="characterPhotoUpload" class="character-photo-upload">
-                            <img id="characterPhotoPreview" class="character-photo-preview" src="" alt="Character Photo">
-                            <i class="fas fa-plus"></i>
-                            <button id="photoSettingsButton" class="photo-settings">
-                                <i class="fas fa-cog"></i>
-                                <div class="dropdown-content">
-                                    <button id="replacePhotoButton">Замінити фото</button>
-                                    <button id="removePhotoButton">Видалити фото</button>
-                                </div>
-                            </button>
-                        </div>
+                    <div class="form-group">
+                        <label for="characterClassLevel">Клас та Рівень</label>
+                        <input type="text" id="characterClassLevel" placeholder="Воїн 3">
+                    </div>
+                    <div class="form-group">
+                        <label for="background">Передісторія</label>
+                        <input type="text" id="background" placeholder="Солдат">
+                    </div>
+                    <div class="form-group">
+                        <label for="playerName">Ім'я гравця</label>
+                        <input type="text" id="playerName" placeholder="Ваше ім'я">
+                    </div>
+                    <div class="header-item">
+                        <label for="characterRace">Раса</label>
+                        <select id="characterRace">
+                            <option value="">Оберіть расу</option>
+                            <option value="human">Людина</option>
+                            <option value="elf">Ельф</option>
+                            <option value="dwarf">Гном</option>
+                            <option value="halfling">Гафлінг</option>
+                            <option value="dragonborn">Драконороджений</option>
+                            <option value="gnome">Гном</option>
+                            <option value="half-elf">Напівельф</option>
+                            <option value="half-orc">Напіворк</option>
+                            <option value="tiefling">Тіфлінг</option>
+                            <option value="aarakocra">Ааракокра</option>
+                            <option value="genasi">Генасі</option>
+                            <option value="goliath">Голіаф</option>
+                            <option value="lizardfolk">Ящер</option>
+                            <option value="tabaxi">Табаксі</option>
+                            <option value="kenku">Кенку</option>
+                            <option value="firbolg">Фірболг</option>
+                            <option value="gith">Гіт</option>
+                            <option value="yuan-ti">Юань-ті</option>
+                            <option value="bugbear">Багбір</option>
+                            <option value="goblin">Гоблін</option>
+                            <option value="hobgoblin">Хобгоблін</option>
+                            <option value="kobold">Кобольд</option>
+                            <option value="orc">Орк</option>
+                            <option value="grung">Ґрунґ</option>
+                            <option value="tortle">Тортл</option>
+                            <option value="leonin">Леонін</option>
+                            <option value="satyr">Сатир</option>
+                            <option value="changeling">Ченджлінг</option>
+                            <option value="kalashtar">Калаштар</option>
+                            <option value="shifter">Шифтер</option>
+                            <option value="warforged">Варфорджд</option>
+                            <option value="vedalken">Ведалкен</option>
+                            <option value="loxodon">Локсодон</option>
+                            <option value="simic-hybrid">Симік-гібрид</option>
+                            <option value="centaur">Кентавр</option>
+                            <option value="minotaur">Мінотавр</option>
+                            <option value="verdan">Вердан</option>
+                            <option value="locathah">Локатах</option>
+                            <option value="grung">Ґрунґ</option>
+                            <option value="owlin">Аулін</option>
+                            <option value="plasmoid">Плазмоїд</option>
+                            <option value="thri-kreen">Трі-крін</option>
+                            <option value="autognome">Автогном</option>
+                            <option value="fairy">Фея</option>
+                            <option value="harengon">Харенгон</option>
+                            <option value="kender">Кендер</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="alignment">Світогляд</label>
+                        <input type="text" id="alignment" placeholder="Законно-Добрий">
+                    </div>
+                    <div class="form-group">
+                        <label for="experiencePoints">Досвід</label>
+                        <input type="number" id="experiencePoints" value="0">
                     </div>
                 </div>
 
+                <div class="photo-section">
+                    <div id="characterPhotoUpload" class="character-photo-upload">
+                        <img id="characterPhotoPreview" class="character-photo-preview" src="" alt="Character Photo">
+                        <i class="fas fa-plus"></i>
+                        <button id="photoSettingsButton" class="photo-settings">
+                            <i class="fas fa-cog"></i>
+                            <div class="dropdown-content">
+                                <button id="replacePhotoButton">Замінити фото</button>
+                                <button id="removePhotoButton">Видалити фото</button>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sheet-section">
                 <h2>Характеристики</h2>
                 <div class="form-grid abilities">
                     <div class="ability">
