@@ -14,7 +14,7 @@ let saveTimer = null; // Для дебаунсингу
 function debounce(func, delay) {
     return function(...args) {
         const context = this;
-        clearTimeout(saveTimer);
+        clearTimeout(saveTimer); // Очищаємо попередній таймер
         saveTimer = setTimeout(() => func.apply(context, args), delay);
     };
 }
@@ -22,6 +22,11 @@ function debounce(func, delay) {
 // Функція для отримання всіх полів вводу та вибору з поточного листа
 function getSheetInputElements() {
     const container = document.getElementById('characterSheetContainer');
+    // Перевіряємо, чи контейнер існує, перш ніж шукати елементи
+    if (!container) {
+        console.error("Контейнер characterSheetContainer не знайдено!");
+        return {}; // Повертаємо порожній об'єкт, щоб уникнути помилок
+    }
     return {
         characterName: container.querySelector('#characterName'),
         characterClassLevel: container.querySelector('#characterClassLevel'),
@@ -54,37 +59,52 @@ function getSheetInputElements() {
 
 // Функція для збереження даних активного листа в localStorage
 function saveActiveSheetData() {
-    if (characterSheets.length === 0) return;
+    if (characterSheets.length === 0) {
+        console.warn("Спроба зберегти дані, коли characterSheets порожній.");
+        return;
+    }
+    if (activeSheetIndex < 0 || activeSheetIndex >= characterSheets.length) {
+        console.error(`Некоректний activeSheetIndex: ${activeSheetIndex}. Доступно листів: ${characterSheets.length}.`);
+        return;
+    }
 
     const elements = getSheetInputElements();
-    // Створюємо новий об'єкт для поточних даних, щоб уникнути посилань
+    
+    // Перевіряємо, чи всі ключові елементи існують
+    if (!elements.characterName || !elements.strengthScore) {
+        console.warn("Не всі елементи листа персонажа доступні для збереження. Пропускаємо збереження.");
+        return;
+    }
+
+    // Створюємо новий об'єкт для поточних даних, щоб уникнути посилань на старі об'єкти
     const currentSheetData = {
-        characterName: elements.characterName.value,
-        characterClassLevel: elements.characterClassLevel.value,
-        background: elements.background.value,
-        playerName: elements.playerName.value,
-        characterRace: elements.characterRace.value,
-        alignment: elements.alignment.value,
-        experiencePoints: elements.experiencePoints.value,
-        strengthScore: elements.strengthScore.value,
-        dexterityScore: elements.dexterityScore.value,
-        constitutionScore: elements.constitutionScore.value,
-        intelligenceScore: elements.intelligenceScore.value,
-        wisdomScore: elements.wisdomScore.value,
-        charismaScore: elements.charismaScore.value,
-        maxHp: elements.maxHp.value,
-        currentHp: elements.currentHp.value,
-        tempHp: elements.tempHp.value,
-        characterPhotoUrl: elements.characterPhotoUrl.value
+        characterName: elements.characterName.value || '',
+        characterClassLevel: elements.characterClassLevel.value || '',
+        background: elements.background.value || '',
+        playerName: elements.playerName.value || '',
+        characterRace: elements.characterRace.value || '',
+        alignment: elements.alignment.value || '',
+        experiencePoints: elements.experiencePoints.value || '0',
+        strengthScore: elements.strengthScore.value || '10',
+        dexterityScore: elements.dexterityScore.value || '10',
+        constitutionScore: elements.constitutionScore.value || '10',
+        intelligenceScore: elements.intelligenceScore.value || '10',
+        wisdomScore: elements.wisdomScore.value || '10',
+        charismaScore: elements.charismaScore.value || '10',
+        maxHp: elements.maxHp.value || '10',
+        currentHp: elements.currentHp.value || '10',
+        tempHp: elements.tempHp.value || '0',
+        characterPhotoUrl: elements.characterPhotoUrl.value || ''
     };
 
-    // Замінюємо об'єкт у масиві повністю
+    // Замінюємо об'єкт у масиві повністю новою копією
     characterSheets[activeSheetIndex] = currentSheetData;
+    
     try {
         localStorage.setItem(DARQIE_SHEETS_KEY, JSON.stringify(characterSheets));
         localStorage.setItem(DARQIE_ACTIVE_INDEX_KEY, activeSheetIndex.toString());
-        console.log('Дані активного листа збережено в localStorage:', characterSheets[activeSheetIndex]);
-        updateCharacterSelect();
+        console.log(`Дані листа ${characterSheets[activeSheetIndex].characterName} (індекс ${activeSheetIndex}) збережено в localStorage:`, characterSheets[activeSheetIndex]);
+        updateCharacterSelect(); // Оновлюємо випадаючий список після збереження
     } catch (error) {
         console.error("Помилка збереження даних в localStorage:", error);
         alert("Помилка збереження листа персонажа.");
@@ -107,56 +127,60 @@ function loadActiveSheetData() {
         return;
     }
 
-    if (activeSheetIndex >= characterSheets.length) {
+    // Забезпечуємо, що activeSheetIndex знаходиться в межах допустимих значень
+    if (activeSheetIndex < 0 || activeSheetIndex >= characterSheets.length) {
         activeSheetIndex = Math.max(0, characterSheets.length - 1);
+        console.warn(`Скориговано activeSheetIndex до ${activeSheetIndex}`);
     }
 
-    // Створюємо глибоку копію листа для відображення, щоб уникнути прямих посилань
-    // до об'єктів у characterSheets при роботі з полями вводу.
-    // Хоча saveActiveSheetData створює новий об'єкт, це додає додатковий рівень безпеки
-    // та робить логіку більш надійною.
+    // Створюємо глибоку копію активного листа для відображення.
+    // Це ГАРАНТУЄ, що ми не працюємо з посиланням на об'єкт з characterSheets.
     const sheetData = JSON.parse(JSON.stringify(characterSheets[activeSheetIndex]));
-
+    
     const elements = getSheetInputElements();
 
-    elements.characterName.value = sheetData.characterName || '';
-    elements.characterClassLevel.value = sheetData.characterClassLevel || '';
-    elements.background.value = sheetData.background || '';
-    elements.playerName.value = sheetData.playerName || '';
-    elements.characterRace.value = sheetData.characterRace || '';
-    elements.alignment.value = sheetData.alignment || '';
-    elements.experiencePoints.value = sheetData.experiencePoints || '0';
-    elements.strengthScore.value = sheetData.strengthScore || '10';
-    elements.dexterityScore.value = sheetData.dexterityScore || '10'; // Переконайтеся, що це коректно завантажується
-    elements.constitutionScore.value = sheetData.constitutionScore || '10';
-    elements.intelligenceScore.value = sheetData.intelligenceScore || '10';
-    elements.wisdomScore.value = sheetData.wisdomScore || '10';
-    elements.charismaScore.value = sheetData.charismaScore || '10';
-    elements.maxHp.value = sheetData.maxHp || '10';
-    elements.currentHp.value = sheetData.currentHp || '10';
-    elements.tempHp.value = sheetData.tempHp || '0';
+    // Перевіряємо наявність елементів перед присвоєнням
+    if (elements.characterName) elements.characterName.value = sheetData.characterName || '';
+    if (elements.characterClassLevel) elements.characterClassLevel.value = sheetData.characterClassLevel || '';
+    if (elements.background) elements.background.value = sheetData.background || '';
+    if (elements.playerName) elements.playerName.value = sheetData.playerName || '';
+    if (elements.characterRace) elements.characterRace.value = sheetData.characterRace || '';
+    if (elements.alignment) elements.alignment.value = sheetData.alignment || '';
+    if (elements.experiencePoints) elements.experiencePoints.value = sheetData.experiencePoints || '0';
+    if (elements.strengthScore) elements.strengthScore.value = sheetData.strengthScore || '10';
+    if (elements.dexterityScore) elements.dexterityScore.value = sheetData.dexterityScore || '10';
+    if (elements.constitutionScore) elements.constitutionScore.value = sheetData.constitutionScore || '10';
+    if (elements.intelligenceScore) elements.intelligenceScore.value = sheetData.intelligenceScore || '10';
+    if (elements.wisdomScore) elements.wisdomScore.value = sheetData.wisdomScore || '10';
+    if (elements.charismaScore) elements.charismaScore.value = sheetData.charismaScore || '10';
+    if (elements.maxHp) elements.maxHp.value = sheetData.maxHp || '10';
+    if (elements.currentHp) elements.currentHp.value = sheetData.currentHp || '10';
+    if (elements.tempHp) elements.tempHp.value = sheetData.tempHp || '0';
 
-    elements.characterPhotoUrl.value = sheetData.characterPhotoUrl || '';
-    if (sheetData.characterPhotoUrl) {
-        elements.characterPhotoPreview.src = sheetData.characterPhotoUrl;
-        elements.characterPhotoPreview.style.display = 'block';
-    } else {
-        elements.characterPhotoPreview.src = '';
-        elements.characterPhotoPreview.style.display = 'none';
+    if (elements.characterPhotoUrl) elements.characterPhotoUrl.value = sheetData.characterPhotoUrl || '';
+    if (elements.characterPhotoPreview) {
+        if (sheetData.characterPhotoUrl) {
+            elements.characterPhotoPreview.src = sheetData.characterPhotoUrl;
+            elements.characterPhotoPreview.style.display = 'block';
+        } else {
+            elements.characterPhotoPreview.src = '';
+            elements.characterPhotoPreview.style.display = 'none';
+        }
     }
 
-    updateAbilityModifier(elements.strengthScore, elements.strengthModifier);
-    updateAbilityModifier(elements.dexterityScore, elements.dexterityModifier);
-    updateAbilityModifier(elements.constitutionScore, elements.constitutionModifier);
-    updateAbilityModifier(elements.intelligenceScore, elements.intelligenceModifier);
-    updateAbilityModifier(elements.wisdomScore, elements.wisdomModifier);
-    updateAbilityModifier(elements.charismaScore, elements.charismaModifier);
+    // Оновлюємо модифікатори, перевіряючи наявність елементів
+    if (elements.strengthScore && elements.strengthModifier) updateAbilityModifier(elements.strengthScore, elements.strengthModifier);
+    if (elements.dexterityScore && elements.dexterityModifier) updateAbilityModifier(elements.dexterityScore, elements.dexterityModifier);
+    if (elements.constitutionScore && elements.constitutionModifier) updateAbilityModifier(elements.constitutionScore, elements.constitutionModifier);
+    if (elements.intelligenceScore && elements.intelligenceModifier) updateAbilityModifier(elements.intelligenceScore, elements.intelligenceModifier);
+    if (elements.wisdomScore && elements.wisdomModifier) updateAbilityModifier(elements.wisdomScore, elements.wisdomModifier);
+    if (elements.charismaScore && elements.charismaModifier) updateAbilityModifier(elements.charismaScore, elements.charismaModifier);
 
     if (characterSheetTemplate) {
         characterSheetTemplate.style.display = 'flex';
     }
 
-    console.log('Дані активного листа завантажено:', sheetData);
+    console.log(`Дані листа ${sheetData.characterName} (індекс ${activeSheetIndex}) завантажено та відображено.`);
     updateCharacterSelect();
 }
 
@@ -173,6 +197,7 @@ function addCharacterSheet() {
         return;
     }
 
+    // Зберігаємо дані поточного листа перед перемиканням на новий
     if (characterSheets.length > 0) {
         saveActiveSheetData();
     }
@@ -199,8 +224,8 @@ function addCharacterSheet() {
     characterSheets.push(newSheetData);
     activeSheetIndex = characterSheets.length - 1;
 
-    saveActiveSheetData();
-    loadActiveSheetData();
+    saveActiveSheetData(); // Зберігаємо новий лист у localStorage
+    loadActiveSheetData(); // Завантажуємо та відображаємо новий лист
     console.log('Додано новий лист персонажа. Загалом листів:', characterSheets.length);
 }
 
@@ -211,33 +236,49 @@ function deleteCharacterSheet() {
     }
 
     if (confirm(`Ви впевнені, що хочете видалити лист "${characterSheets[activeSheetIndex].characterName || 'Без назви'}"?`)) {
-        characterSheets.splice(activeSheetIndex, 1);
+        const deletedIndex = activeSheetIndex; // Зберігаємо індекс, який видаляємо
+        characterSheets.splice(deletedIndex, 1);
 
         if (characterSheets.length === 0) {
             activeSheetIndex = 0;
-            addCharacterSheet();
+            addCharacterSheet(); // Створюємо новий порожній лист
             return;
         } else if (activeSheetIndex >= characterSheets.length) {
+            // Якщо активний індекс був останнім, або після нього нічого не залишилось
             activeSheetIndex = characterSheets.length - 1;
         }
+        // Якщо видалили лист перед активним, активний індекс не змінюється
 
-        saveActiveSheetData();
+        saveActiveSheetData(); // Зберігаємо зміни після видалення
         console.log('Лист персонажа видалено. Залишилось листів:', characterSheets.length);
-        loadActiveSheetData();
+        loadActiveSheetData(); // Завантажуємо новий активний лист
     }
 }
 
 function switchCharacterSheet(index) {
-    if (index === activeSheetIndex) return;
+    if (index === activeSheetIndex) {
+        console.log(`Спроба переключитися на той самий лист (індекс ${index}). Нічого не робимо.`);
+        return;
+    }
 
-    saveActiveSheetData();
+    // Зберігаємо дані поточного листа ПЕРЕД перемиканням
+    console.log(`Зберігаємо поточний лист (індекс ${activeSheetIndex}) перед перемиканням на індекс ${index}.`);
+    clearTimeout(saveTimer); // Гарантуємо, що поточний дебаунс збереження завершиться негайно або буде скасований
+    saveActiveSheetData(); // Явно викликаємо збереження
+
     activeSheetIndex = index;
-    saveActiveSheetData();
+    // saveActiveSheetData(); // Цей виклик тут не потрібен, оскільки loadActiveSheetData викличе updateCharacterSelect, який збереже активний індекс
+    
+    console.log(`Перемикаємося на лист з індексом ${activeSheetIndex}.`);
     loadActiveSheetData();
 }
 
 function updateCharacterSelect() {
     const characterSelect = document.getElementById('characterSelect');
+    if (!characterSelect) {
+        console.error("Елемент #characterSelect не знайдено!");
+        return;
+    }
     characterSelect.innerHTML = '';
 
     characterSheets.forEach((sheet, index) => {
@@ -286,6 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Завантажуємо всі листи з localStorage при старті
     try {
         const savedSheetsString = localStorage.getItem(DARQIE_SHEETS_KEY);
         if (savedSheetsString) {
@@ -312,8 +354,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Викликаємо loadActiveSheetData тільки один раз після ініціалізації characterSheets
     loadActiveSheetData();
 
+    // Додаємо слухачів подій до всіх полів для збереження при зміні
     const allInputElements = document.querySelectorAll('#characterSheetContainer input, #characterSheetContainer select');
     allInputElements.forEach(element => {
         element.addEventListener('input', debouncedSaveActiveSheetData);
@@ -330,10 +374,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Оновлення модифікаторів після завантаження даних (вже зроблено в loadActiveSheetData, але можна залишити для надійності)
     const elements = getSheetInputElements();
-    // Ці оновлення повинні бути викликані вже після loadActiveSheetData(),
-    // яка вже викликає updateAbilityModifier для всіх елементів.
-    // Залишаємо їх тут як додаткову перевірку, але вони можуть бути надмірними.
     if (elements.strengthScore) updateAbilityModifier(elements.strengthScore, elements.strengthModifier);
     if (elements.dexterityScore) updateAbilityModifier(elements.dexterityScore, elements.dexterityModifier);
     if (elements.constitutionScore) updateAbilityModifier(elements.constitutionScore, elements.constitutionModifier);
