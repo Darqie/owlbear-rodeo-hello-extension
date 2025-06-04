@@ -7,7 +7,7 @@
   "action": {
     "title": "Hello, World!",
     "icon": "/icon.svg",
-    "popover": "/index.html",  <-- ЗМІНЕНО ТУТ
+    "popover": "/index.html",
     "height": 600,
     "width": 400
   }
