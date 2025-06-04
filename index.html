@@ -43,6 +43,32 @@
             padding: 5px;
             background-color: rgba(255, 255, 255, 0.05);
             border-radius: 3px;
+            display: flex; /* Додаємо flex для вирівнювання вмісту */
+            flex-direction: column; /* Елементи всередині стовпцем */
+        }
+
+        .header-item label {
+            font-size: 0.8em;
+            color: #b0b0b0;
+            margin-bottom: 3px;
+        }
+
+        .header-item input[type="text"],
+        .header-item select {
+            width: 100%;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.1); /* Напівпрозорий фон для полів */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            color: #e0e0e0; /* Колір тексту в полях */
+            font-size: 1em;
+            box-sizing: border-box; /* Враховує padding та border у загальній ширині */
+        }
+
+        .header-item input[type="text"]:focus,
+        .header-item select:focus {
+            outline: none;
+            border-color: #4CAF50; /* Зелена облямівка при фокусі */
         }
 
         .ability-scores {
@@ -100,16 +126,86 @@
 </head>
 <body>
     <div class="header-block">
-        <div class="header-item">Назва Персонажа</div>
-        <div class="header-item">Клас & Рівень</div>
-        <div class="header-item">Передісторія</div>
-        <div class="header-item">Ім'я Гравця</div>
+        <div class="header-item">
+            <label for="characterName">Назва Персонажа</label>
+            <input type="text" id="characterName" placeholder="Введіть назву персонажа">
+        </div>
+        <div class="header-item">
+            <label for="characterClassLevel">Клас & Рівень</label>
+            <input type="text" id="characterClassLevel" placeholder="Введіть клас та рівень">
+        </div>
+        <div class="header-item">
+            <label for="background">Передісторія</label>
+            <input type="text" id="background" placeholder="Введіть передісторію">
+        </div>
+        <div class="header-item">
+            <label for="playerName">Ім'я Гравця</label>
+            <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
+        </div>
     </div>
 
     <div class="header-block">
-        <div class="header-item">Раса</div>
-        <div class="header-item">Світогляд</div>
-        <div class="header-item">Досвід</div>
+        <div class="header-item">
+            <label for="characterRace">Раса</label>
+            <select id="characterRace">
+                <option value="">Оберіть расу</option>
+                <option value="human">Людина</option>
+                <option value="elf">Ельф</option>
+                <option value="dwarf">Гном</option>
+                <option value="halfling">Гафлінг</option>
+                <option value="dragonborn">Драконороджений</option>
+                <option value="gnome">Гном</option>
+                <option value="half-elf">Напівельф</option>
+                <option value="half-orc">Напіворк</option>
+                <option value="tiefling">Тіфлінг</option>
+                <option value="aarakocra">Ааракокра</option>
+                <option value="genasi">Генасі</option>
+                <option value="goliath">Голіаф</option>
+                <option value="lizardfolk">Ящер</option>
+                <option value="tabaxi">Табаксі</option>
+                <option value="kenku">Кенку</option>
+                <option value="firbolg">Фірболг</option>
+                <option value="gith">Гіт</option>
+                <option value="yuan-ti">Юань-ті</option>
+                <option value="bugbear">Багбір</option>
+                <option value="goblin">Гоблін</option>
+                <option value="hobgoblin">Хобгоблін</option>
+                <option value="kobold">Кобольд</option>
+                <option value="orc">Орк</option>
+                <option value="grung">Ґрунґ</option>
+                <option value="tortle">Тортл</option>
+                <option value="leonin">Леонін</option>
+                <option value="satyr">Сатир</option>
+                <option value="changeling">Ченджлінг</option>
+                <option value="kalashtar">Калаштар</option>
+                <option value="shifter">Шифтер</option>
+                <option value="warforged">Варфорджд</option>
+                <option value="vedalken">Ведалкен</option>
+                <option value="loxodon">Локсодон</option>
+                <option value="simic-hybrid">Симік-гібрид</option>
+                <option value="centaur">Кентавр</option>
+                <option value="minotaur">Мінотавр</option>
+                <option value="verdan">Вердан</option>
+                <option value="locathah">Локатах</option>
+                <option value="grung">Ґрунґ</option>
+                <option value="owlin">Аулін</option>
+                <option value="plasmoid">Плазмоїд</option>
+                <option value="thri-kreen">Трі-крін</option>
+                <option value="autognome">Автогном</option>
+                <option value="fairy">Фея</option>
+                <option value="harengon">Харенгон</option>
+                <option value="kender">Кендер</option>
+                <option value="minotaur">Мінотавр</option>
+            </select>
+        </div>
+        <div class="header-item">
+            <label for="alignment">Світогляд</label>
+            <input type="text" id="alignment" placeholder="Введіть світогляд">
+        </div>
+        <div class="header-item">
+            <label for="experiencePoints">Досвід</label>
+            <input type="text" id="experiencePoints" placeholder="0">
+        </div>
     </div>
 
     <div class="ability-scores">
