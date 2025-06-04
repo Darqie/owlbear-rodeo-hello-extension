@@ -12,17 +12,36 @@
         margin: 0;
         padding: 20px;
         display: flex;
+        flex-direction: column; /* Додано: для кращого розташування елементів по вертикалі */
         justify-content: center;
         align-items: center;
         min-height: 100vh;
-        background-color: #2c2c2c; /* Owlbear Rodeo dark theme */
+        background-color: rgba(0, 0, 0, 0.3); /* Змінено: Напівпрозорий чорний фон */
         color: #e0e0e0;
         font-size: 24px;
         text-align: center;
+        backdrop-filter: blur(10px); /* Додано: Ефект розмиття */
+        -webkit-backdrop-filter: blur(10px); /* Додано: Для підтримки в Safari */
+      }
+
+      /* Додамо базові стилі для майбутніх елементів, якщо вони будуть */
+      button {
+          background-color: #4CAF50; /* Зелена кнопка */
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          margin-top: 20px;
+      }
+
+      button:hover {
+          background-color: #45a049;
       }
     </style>
   </head>
   <body>
-    Ой, а хто тут молодець? а я тут молодець!
-  </body>
+    <h1>Ой, а хто тут молодець? а я тут молодець!</h1>
+    </body>
 </html>
