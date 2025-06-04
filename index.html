@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лист Персонажа</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="main.js" defer></script>
 </head>
 <body>
     <div class="character-controls">
-        <div class="character-tabs" id="characterTabs">
+        <div class="character-tabs">
+            <select id="characterSelect"></select>
         </div>
         <button id="addCharacterButton">+</button>
-        <button id="deleteCharacterButton">Видалити</button>
+        <button id="deleteCharacterButton"><i class="fas fa-trash-alt"></i></button>
     </div>
 
+
     <div id="characterSheetContainer">
-        <div class="character-sheet" id="characterSheetTemplate" style="display: none;"> 
+        <div class="character-sheet" id="characterSheetTemplate" style="display: none;">
             <div class="header-block">
                 <div class="header-item">
                     <label for="characterName">Назва Персонажа</label>
@@ -37,6 +40,7 @@
                     <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
                 </div>
             </div>
+
 
             <div class="header-block">
                 <div class="header-item">
@@ -106,6 +110,7 @@
                 </div>
             </div>
 
+
             <div class="ability-scores">
                 <div class="ability">
                     <div>СИЛА</div>
@@ -139,6 +144,7 @@
                 </div>
             </div>
 
+
             <div class="hp-block">
                 <div class="hp-item">
                     <div>МАКСИМУМ HP</div>
@@ -153,6 +159,7 @@
                     <input type="number" id="tempHp" value="0">
                 </div>
             </div>
+
 
             <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
             <div class="block"><h2>НАВИЧКИ</h2></div>
