@@ -1,0 +1,247 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 100vh;
+    background-color: rgba(30, 34, 49, 0.1);
+    color: #e0e0e0;
+    font-size: 16px;
+    line-height: 1.4;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+}
+
+.character-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.character-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex-grow: 1;
+}
+
+.character-tab {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s, border-color 0.2s;
+    position: relative;
+}
+
+.character-tab:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.character-tab.active {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+
+.character-tab .close-tab {
+    margin-left: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.character-tab .close-tab:hover {
+    color: #ff4d4d;
+}
+
+#addCharacterButton, #deleteCharacterButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+    margin-left: 5px;
+}
+
+#addCharacterButton:hover {
+    background-color: #45a049;
+}
+
+#deleteCharacterButton {
+    background-color: #f44336;
+}
+
+#deleteCharacterButton:hover {
+    background-color: #d32f2f;
+}
+
+
+#characterSheetContainer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.character-sheet {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.block {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.header-block {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.header-item {
+    flex-grow: 1;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-item label {
+    font-size: 0.8em;
+    color: #b0b0b0;
+    margin-bottom: 3px;
+}
+
+.header-item input[type="text"],
+.header-item input[type="number"],
+.header-item select,
+.ability input, .hp-item input {
+    width: 100%;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    color: #e0e0e0;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.header-item input[type="text"]:focus,
+.header-item input[type="number"]:focus,
+.header-item select:focus,
+.ability input:focus, .hp-item input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/* Стилі для поля посилання на фото */
+.character-photo-item {
+    flex-basis: 100%;
+    margin-top: 10px;
+}
+.character-photo-item img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 5px;
+    object-fit: cover;
+    margin-top: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
+.ability-scores {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.ability {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ability div:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.ability .modifier {
+    font-size: 0.9em;
+    color: #b0b0b0;
+}
+.ability input.score-input {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.hp-block {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.hp-item {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.hp-item div:first-child {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.hp-item input {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+h2 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #fff;
+}
