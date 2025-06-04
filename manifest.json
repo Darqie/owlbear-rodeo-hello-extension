@@ -1,10 +1,7 @@
 {
   "name": "Привітання Owlbear",
-  "author": "Darqie",
+  "author": "darqie",
   "version": "1.0.0",
-  "manifest_version": 1,
   "description": "Просте розширення для Owlbear Rodeo, яке виводить привітання.",
-  "background": {
-    "page": "background.html"
-  }
+  "scripts": ["main.js"]
 }
