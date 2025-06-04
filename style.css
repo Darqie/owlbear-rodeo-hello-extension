@@ -15,6 +15,7 @@ body {
     position: relative;
 }
 
+
 .character-controls {
     display: flex;
     justify-content: space-between;
@@ -24,46 +25,41 @@ body {
     flex-wrap: wrap;
 }
 
+
 .character-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
     flex-grow: 1;
 }
 
-.character-tab {
-    background-color: rgba(255, 255, 255, 0.1);
+
+#characterSelect {
+    width: 100%;
+    padding: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
-    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    font-size: 1em;
+    box-sizing: border-box;
+    appearance: none; /* Прибирає стандартні стилі випадаючого списку */
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg fill="%23e0e0e0" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1em;
     cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.2s, border-color 0.2s;
-    position: relative;
 }
 
-.character-tab:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
 
-.character-tab.active {
-    background-color: #4CAF50;
+#characterSelect:focus {
+    outline: none;
     border-color: #4CAF50;
-    color: white;
-    font-weight: bold;
 }
 
-.character-tab .close-tab {
-    margin-left: 8px;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.9em;
+
+#characterSelect option {
+    background-color: #333;
+    color: #e0e0e0;
 }
 
-.character-tab .close-tab:hover {
-    color: #ff4d4d;
-}
 
 #addCharacterButton, #deleteCharacterButton {
     background-color: #4CAF50;
@@ -82,13 +78,17 @@ body {
     margin-left: 5px;
 }
 
+
 #addCharacterButton:hover {
     background-color: #45a049;
 }
 
+
 #deleteCharacterButton {
     background-color: #f44336;
+    font-size: 16px;
 }
+
 
 #deleteCharacterButton:hover {
     background-color: #d32f2f;
@@ -104,11 +104,13 @@ body {
     padding-right: 5px;
 }
 
+
 .character-sheet {
     display: flex;
     flex-direction: column;
     width: 100%;
 }
+
 
 .block {
     background-color: rgba(255, 255, 255, 0.05);
@@ -118,12 +120,14 @@ body {
     margin-bottom: 10px;
 }
 
+
 .header-block {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     flex-wrap: wrap;
 }
+
 
 .header-item {
     flex-grow: 1;
@@ -134,39 +138,53 @@ body {
     flex-direction: column;
 }
 
+
 .header-item label {
     font-size: 0.8em;
     color: #b0b0b0;
     margin-bottom: 3px;
 }
 
-.header-item input[type="text"],
-.header-item input[type="number"],
+
+.header-item input,
+.header-item input::placeholder,
 .header-item select,
-.ability input, .hp-item input {
+.ability input,
+.hp-item input {
+    color: #e0e0e0;
+}
+
+
+.header-item input,
+.header-item select,
+.ability input,
+.hp-item input {
     width: 100%;
     padding: 5px;
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 3px;
-    color: #e0e0e0;
     font-size: 1em;
     box-sizing: border-box;
 }
 
-.header-item input[type="text"]:focus,
-.header-item input[type="number"]:focus,
+
+.header-item input:focus,
 .header-item select:focus,
-.ability input:focus, .hp-item input:focus {
+.ability input:focus,
+.hp-item input:focus {
     outline: none;
     border-color: #4CAF50;
 }
+
 
 /* Стилі для поля посилання на фото */
 .character-photo-item {
     flex-basis: 100%;
     margin-top: 10px;
 }
+
+
 .character-photo-item img {
     max-width: 100px;
     max-height: 100px;
@@ -177,12 +195,15 @@ body {
 }
 
 
+
+
 .ability-scores {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     flex-wrap: wrap;
 }
+
 
 .ability {
     flex: 1;
@@ -196,14 +217,19 @@ body {
     align-items: center;
 }
 
+
 .ability div:first-child {
     font-weight: bold;
     margin-bottom: 5px;
 }
+
+
 .ability .modifier {
     font-size: 0.9em;
     color: #b0b0b0;
 }
+
+
 .ability input.score-input {
     width: calc(100% - 10px);
     margin-top: 5px;
@@ -211,12 +237,14 @@ body {
     font-weight: bold;
 }
 
+
 .hp-block {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     flex-wrap: wrap;
 }
+
 
 .hp-item {
     flex: 1;
@@ -229,15 +257,20 @@ body {
     flex-direction: column;
     align-items: center;
 }
+
+
 .hp-item div:first-child {
     font-weight: bold;
     margin-bottom: 5px;
 }
+
+
 .hp-item input {
     font-size: 1.1em;
     font-weight: bold;
     margin-top: 5px;
 }
+
 
 h2 {
     font-size: 1.2em;
