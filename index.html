@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лист Персонажа</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="main.js" defer></script>
     <style>
         body {
@@ -48,7 +49,9 @@
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s, border-color 0.2s;
-            position: relative; /* Для позиціонування кнопки видалення на вкладці */
+            position: relative;
+            display: flex; /* Для вирівнювання тексту і хрестика */
+            align-items: center;
         }
 
         .character-tab:hover {
@@ -71,11 +74,12 @@
         }
 
         .character-tab .close-tab:hover {
-            color: #ff4d4d; /* Червоний при наведенні */
+            color: #ff4d4d;
         }
 
+        /* Стилі для кнопок "+" та "-" */
         #addCharacterButton, #deleteCharacterButton {
-            background-color: #4CAF50; /* Зелена для додавання */
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 50%;
@@ -88,7 +92,8 @@
             cursor: pointer;
             transition: background-color 0.2s;
             flex-shrink: 0;
-            margin-left: 5px; /* Невеликий відступ від вкладок */
+            margin-left: 5px;
+            font-weight: bold; /* Для жирнішого "+" */
         }
 
         #addCharacterButton:hover {
@@ -97,12 +102,14 @@
 
         #deleteCharacterButton {
             background-color: #f44336; /* Червона для видалення */
+            font-size: 24px; /* Трохи більший для "-" */
+            line-height: 1; /* Вирівнювання по центру */
+            padding-bottom: 2px; /* Коригування позиції "-" */
         }
 
         #deleteCharacterButton:hover {
             background-color: #d32f2f;
         }
-
 
         #characterSheetContainer {
             flex-grow: 1;
@@ -171,20 +178,92 @@
             border-color: #4CAF50;
         }
 
-        /* Стилі для поля посилання на фото */
-        .character-photo-item {
-            flex-basis: 100%; /* Займає всю ширину */
-            margin-top: 10px; /* Відступ зверху */
-        }
-        .character-photo-item img {
-            max-width: 100px; /* Розмір прев'ю фото */
-            max-height: 100px;
+        /* Стилі для блоку завантаження фото */
+        .character-photo-upload {
+            width: 120px; /* Розмір квадрата */
+            height: 120px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.3); /* Пунктирна облямівка */
             border-radius: 5px;
-            object-fit: cover;
-            margin-top: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative; /* Для позиціонування іконки */
+            overflow: hidden; /* Щоб зображення не виходило за межі */
+            margin-top: 10px; /* Відступ від попереднього блоку */
+            flex-shrink: 0; /* Не дозволяємо стискатися */
+            flex-grow: 0;
         }
 
+        .character-photo-upload .fa-plus {
+            font-size: 48px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .character-photo-upload:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .character-photo-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Обрізаємо зображення, щоб воно заповнювало квадрат */
+            display: none; /* Приховуємо за замовчуванням */
+        }
+
+        .photo-settings {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            display: none; /* Приховано за замовчуванням */
+            z-index: 10; /* Щоб була поверх зображення */
+        }
+
+        .photo-settings:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .photo-settings .dropdown-content {
+            position: absolute;
+            top: 100%; /* Під кнопкою */
+            right: 0;
+            background-color: #333;
+            min-width: 120px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+            display: none; /* Приховано за замовчуванням */
+        }
+
+        .photo-settings .dropdown-content button {
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .photo-settings .dropdown-content button:hover {
+            background-color: #555;
+        }
 
         .ability-scores {
             display: flex;
@@ -261,7 +340,7 @@
         <div class="character-tabs" id="characterTabs">
             </div>
         <button id="addCharacterButton">+</button>
-        <button id="deleteCharacterButton">Видалити</button>
+        <button id="deleteCharacterButton">-</button>
     </div>
 
     <div id="characterSheetContainer">
@@ -346,10 +425,16 @@
                     <label for="experiencePoints">Досвід</label>
                     <input type="number" id="experiencePoints" placeholder="0">
                 </div>
-                <div class="header-item character-photo-item">
-                    <label for="characterPhotoUrl">Посилання на фото</label>
-                    <input type="text" id="characterPhotoUrl" placeholder="URL зображення">
-                    <img id="characterPhotoPreview" src="" alt="Фото персонажа" style="display: none;">
+            </div>
+            <div class="character-photo-upload" id="characterPhotoUpload">
+                <i class="fas fa-plus"></i>
+                <img id="characterPhotoPreview" src="" alt="Фото персонажа">
+                <div class="photo-settings" id="photoSettingsButton">
+                    <i class="fas fa-cog"></i>
+                    <div class="dropdown-content">
+                        <button id="replacePhotoButton">Замінити фото</button>
+                        <button id="removePhotoButton">Видалити фото</button>
+                    </div>
                 </div>
             </div>
 
