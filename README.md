@@ -1,2 +1,2 @@
 # owlbear-rodeo-hello-extension
-оє перше розширення для Owlbear Rodeo
+Моє перше розширення для Owlbear Rodeo
