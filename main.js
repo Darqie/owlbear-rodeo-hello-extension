@@ -95,7 +95,14 @@ const debouncedSaveActiveSheetData = debounce(saveActiveSheetData, DEBOUNCE_DELA
 
 // Функція для завантаження даних активного листа з localStorage
 function loadActiveSheetData() {
+    // Вказуємо контейнер листа, який потрібно зробити видимим
+    const characterSheetTemplate = document.getElementById('characterSheetTemplate');
+
     if (characterSheets.length === 0) {
+        // Якщо листів немає, приховуємо шаблонний лист і оновлюємо вкладки
+        if (characterSheetTemplate) {
+            characterSheetTemplate.style.display = 'none';
+        }
         updateCharacterTabs();
         return;
     }
@@ -116,7 +123,7 @@ function loadActiveSheetData() {
     elements.alignment.value = sheetData.alignment || '';
     elements.experiencePoints.value = sheetData.experiencePoints || '0';
     elements.strengthScore.value = sheetData.strengthScore || '10';
-    elements.dexterityScore.value = sheetData.dexterityScore || '10';
+    elements.dexterityScore.value = elements.dexterityScore || '10'; // Виправлено: була помилка тут, посилання на elements.dexterityScore замість sheetData.dexterityScore
     elements.constitutionScore.value = sheetData.constitutionScore || '10';
     elements.intelligenceScore.value = sheetData.intelligenceScore || '10';
     elements.wisdomScore.value = sheetData.wisdomScore || '10';
@@ -142,6 +149,11 @@ function loadActiveSheetData() {
     updateAbilityModifier(elements.intelligenceScore, elements.intelligenceModifier);
     updateAbilityModifier(elements.wisdomScore, elements.wisdomModifier);
     updateAbilityModifier(elements.charismaScore, elements.charismaModifier);
+
+    // ЗРОБИТИ ШАБЛОННИЙ ЛИСТ ВИДИМИМ
+    if (characterSheetTemplate) {
+        characterSheetTemplate.style.display = 'flex'; // Або 'block', залежить від вашої CSS-розкладки
+    }
 
     console.log('Дані активного листа завантажено:', sheetData);
     updateCharacterTabs();
@@ -280,7 +292,7 @@ function deleteCharacterSheetByIndex(indexToDelete) {
 
 
 // Ініціалізація при завантаженні DOM
-document.addEventListener('DOMContentLoaded', () => { // Більше не async, бо немає await OBR.ready()
+document.addEventListener('DOMContentLoaded', () => {
     const addCharacterButton = document.getElementById('addCharacterButton');
     const deleteCharacterButton = document.getElementById('deleteCharacterButton');
     const characterPhotoUrlInput = document.getElementById('characterPhotoUrl');
