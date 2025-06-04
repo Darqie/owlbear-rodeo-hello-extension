@@ -1,8 +1,36 @@
-const LOCAL_STORAGE_KEY = 'dndCharacterSheets';
-const MAX_SHEETS = 10;
+// Owlbear Rodeo SDK - оголошення, що потрібно для використання OBR об'єкту
+// Якщо ви підключаєте OBR SDK як <script src="https://www.owlbear.rodeo/assets/sdk/latest.js"></script>
+// то цей рядок не потрібен, OBR буде глобальним.
+// Але для перестраховки та сучасних практик:
+if (typeof OBR === 'undefined') {
+    console.warn("Owlbear Rodeo SDK (OBR) не знайдено. Функції, що залежать від OBR, можуть не працювати.");
+    // Додайте тут заглушки або повідомлення для розробки поза Owlbear Rodeo
+    window.OBR = {
+        // Модальні вікна (для завантаження файлів)
+        modal: {
+            open: async (url, options) => {
+                console.log(`[MOCK OBR.modal.open] Opening modal for ${url} with options:`, options);
+                alert("MOCK: OBR.modal.open called. File upload would happen here.");
+                // Повертаємо тестовий URL або null
+                return Promise.resolve("https://via.placeholder.com/150/0000FF/FFFFFF?text=MockPhoto");
+            },
+            close: () => console.log("[MOCK OBR.modal.close] Modal closed.")
+        },
+        // Інші заглушки, якщо потрібні
+        player: {
+            getRole: async () => 'GM' // Для тестування ролі
+        },
+        onReady: (callback) => callback(), // Викликаємо одразу для тестування
+        // Додайте інші API, які ви плануєте використовувати, як заглушки
+    };
+}
 
-let characterSheets = [];
-let activeSheetIndex = 0;
+
+const LOCAL_STORAGE_KEY = 'dndCharacterSheets';
+const MAX_SHEETS = 10; // Максимальна кількість листів персонажів
+
+let characterSheets = []; // Масив для зберігання всіх листів персонажів
+let activeSheetIndex = 0; // Індекс активного листа
 
 // Функція для отримання всіх полів вводу та вибору з поточного листа
 function getSheetInputElements() {
@@ -24,8 +52,13 @@ function getSheetInputElements() {
         maxHp: container.querySelector('#maxHp'),
         currentHp: container.querySelector('#currentHp'),
         tempHp: container.querySelector('#tempHp'),
-        characterPhotoUrl: container.querySelector('#characterPhotoUrl'), // Додано поле фото
-        characterPhotoPreview: container.querySelector('#characterPhotoPreview') // Додано прев'ю фото
+        // Нові елементи для фото
+        characterPhotoUpload: container.querySelector('#characterPhotoUpload'),
+        characterPhotoPreview: container.querySelector('#characterPhotoPreview'),
+        photoSettingsButton: container.querySelector('#photoSettingsButton'),
+        photoSettingsDropdown: container.querySelector('#photoSettingsButton .dropdown-content'),
+        replacePhotoButton: container.querySelector('#replacePhotoButton'),
+        removePhotoButton: container.querySelector('#removePhotoButton')
     };
 }
 
@@ -51,12 +84,12 @@ function saveActiveSheetData() {
         maxHp: elements.maxHp.value,
         currentHp: elements.currentHp.value,
         tempHp: elements.tempHp.value,
-        characterPhotoUrl: elements.characterPhotoUrl.value // Зберігаємо URL фото
+        characterPhotoUrl: elements.characterPhotoPreview.src === window.location.href + '#' || elements.characterPhotoPreview.src === '' ? '' : elements.characterPhotoPreview.src // Оновлено для URL фото
     };
 
     characterSheets[activeSheetIndex] = currentSheetData;
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characterSheets));
-    localStorage.setItem('activeSheetIndex', activeSheetIndex.toString()); // Зберігаємо активний індекс
+    localStorage.setItem('activeSheetIndex', activeSheetIndex.toString());
     console.log('Дані активного листа збережено:', characterSheets[activeSheetIndex]);
     updateCharacterTabs(); // Оновлюємо вкладки, щоб відобразити нові імена, якщо змінились
 }
@@ -67,7 +100,6 @@ function loadActiveSheetData() {
         addCharacterSheet();
         return;
     }
-    // Коригуємо індекс, якщо він став некоректним (наприклад, після видалення останнього листа)
     if (activeSheetIndex >= characterSheets.length) {
         activeSheetIndex = Math.max(0, characterSheets.length - 1);
     }
@@ -93,13 +125,22 @@ function loadActiveSheetData() {
     elements.tempHp.value = sheetData.tempHp || '0';
 
     // Завантажуємо фото
-    elements.characterPhotoUrl.value = sheetData.characterPhotoUrl || '';
-    if (sheetData.characterPhotoUrl) {
-        elements.characterPhotoPreview.src = sheetData.characterPhotoUrl;
+    const photoUrl = sheetData.characterPhotoUrl || '';
+    if (photoUrl) {
+        elements.characterPhotoPreview.src = photoUrl;
         elements.characterPhotoPreview.style.display = 'block';
+        elements.characterPhotoUpload.querySelector('.fa-plus').style.display = 'none'; // Приховуємо плюс
+        elements.photoSettingsButton.style.display = 'flex'; // Показуємо шестерню
     } else {
         elements.characterPhotoPreview.src = '';
         elements.characterPhotoPreview.style.display = 'none';
+        elements.characterPhotoUpload.querySelector('.fa-plus').style.display = 'block'; // Показуємо плюс
+        elements.photoSettingsButton.style.display = 'none'; // Приховуємо шестерню
+    }
+
+    // Закриваємо випадаюче меню налаштувань фото, якщо воно було відкрите
+    if (elements.photoSettingsDropdown) {
+        elements.photoSettingsDropdown.style.display = 'none';
     }
 
     console.log('Дані активного листа завантажено:', sheetData);
@@ -118,7 +159,7 @@ function addCharacterSheet() {
     }
 
     const newSheetData = {
-        characterName: `Новий Персонаж ${characterSheets.length + 1}`, // Унікальне ім'я за замовчуванням
+        characterName: `Новий Персонаж ${characterSheets.length + 1}`,
         characterClassLevel: '',
         background: '',
         playerName: '',
@@ -134,7 +175,7 @@ function addCharacterSheet() {
         maxHp: '10',
         currentHp: '10',
         tempHp: '0',
-        characterPhotoUrl: ''
+        characterPhotoUrl: '' // Порожній URL для нового фото
     };
     characterSheets.push(newSheetData);
     activeSheetIndex = characterSheets.length - 1;
@@ -151,21 +192,47 @@ function deleteCharacterSheet() {
         return;
     }
 
-    if (confirm(`Ви впевнені, що хочете видалити лист "${characterSheets[activeSheetIndex].characterName || 'Без назви'}"?`)) {
-        characterSheets.splice(activeSheetIndex, 1); // Видаляємо поточний лист
+    // Запит підтвердження
+    if (confirm(`Ви впевнені, що хочете видалити активний лист "${characterSheets[activeSheetIndex].characterName || 'Без назви'}"?`)) {
+        characterSheets.splice(activeSheetIndex, 1);
 
-        // Оновлюємо activeSheetIndex після видалення
         if (characterSheets.length === 0) {
-            activeSheetIndex = 0; // Немає листів
-            addCharacterSheet(); // Створюємо новий порожній лист
+            activeSheetIndex = 0;
+            addCharacterSheet();
+            return;
         } else if (activeSheetIndex >= characterSheets.length) {
-            activeSheetIndex = characterSheets.length - 1; // Якщо видалили останній, переходимо на попередній
+            activeSheetIndex = characterSheets.length - 1;
         }
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characterSheets));
         localStorage.setItem('activeSheetIndex', activeSheetIndex.toString());
         console.log('Лист персонажа видалено. Залишилось листів:', characterSheets.length);
-        loadActiveSheetData(); // Завантажуємо новий активний лист
+        loadActiveSheetData();
+    }
+}
+
+// Функція для видалення листа за індексом (викликається з вкладки)
+function deleteCharacterSheetByIndex(indexToDelete) {
+    if (characterSheets.length === 1) { // Якщо залишився лише один лист
+        alert('Не можна видалити останній лист. Якщо ви хочете очистити його, ви можете просто видалити дані.');
+        return;
+    }
+
+    if (confirm(`Ви впевнені, що хочете видалити лист "${characterSheets[indexToDelete].characterName || 'Без назви'}"?`)) {
+        characterSheets.splice(indexToDelete, 1);
+
+        if (activeSheetIndex === indexToDelete) {
+            if (activeSheetIndex >= characterSheets.length) {
+                activeSheetIndex = characterSheets.length - 1;
+            }
+        } else if (activeSheetIndex > indexToDelete) {
+            activeSheetIndex--;
+        }
+
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characterSheets));
+        localStorage.setItem('activeSheetIndex', activeSheetIndex.toString());
+        console.log('Лист персонажа видалено. Залишилось листів:', characterSheets.length);
+        loadActiveSheetData();
     }
 }
 
@@ -192,12 +259,11 @@ function updateCharacterTabs() {
         tab.textContent = sheet.characterName || `Персонаж ${index + 1}`;
         tab.dataset.index = index;
 
-        // Кнопка закриття (видалення) вкладки
         const closeBtn = document.createElement('span');
         closeBtn.classList.add('close-tab');
         closeBtn.textContent = 'x';
         closeBtn.addEventListener('click', (event) => {
-            event.stopPropagation(); // Зупиняємо розповсюдження події, щоб не спрацював клік по вкладці
+            event.stopPropagation();
             deleteCharacterSheetByIndex(index);
         });
         tab.appendChild(closeBtn);
@@ -207,29 +273,64 @@ function updateCharacterTabs() {
     });
 }
 
-// Функція для видалення листа за індексом (викликається з вкладки)
-function deleteCharacterSheetByIndex(indexToDelete) {
-    if (confirm(`Ви впевнені, що хочете видалити лист "${characterSheets[indexToDelete].characterName || 'Без назви'}"?`)) {
-        characterSheets.splice(indexToDelete, 1);
+// ***** Функції для роботи з фото через Owlbear Rodeo SDK *****
 
-        // Коригуємо activeSheetIndex, якщо видалено активну вкладку або вкладку перед активною
-        if (activeSheetIndex === indexToDelete) {
-            // Якщо видалили активний лист
-            if (characterSheets.length === 0) {
-                activeSheetIndex = 0; // Встановлюємо 0, щоб потім додати новий
-                addCharacterSheet(); // Створюємо новий, оскільки листів не залишилось
-                return; // Виходимо, щоб не завантажувати старий індекс
-            } else if (activeSheetIndex >= characterSheets.length) {
-                activeSheetIndex = characterSheets.length - 1; // Якщо видалили останній, переходимо на попередній
-            }
-        } else if (activeSheetIndex > indexToDelete) {
-            activeSheetIndex--; // Якщо видалили лист перед активним, зменшуємо індекс активного
+// Функція для відкриття вікна завантаження файлу через OBR
+async function uploadCharacterPhoto() {
+    console.log("Attempting to upload photo via OBR SDK...");
+    try {
+        const result = await OBR.modal.open({
+            url: "/upload-modal.html", // Або інший URL, якщо у вас є спеціальна модалка для завантаження
+                                       // Owlbear Rodeo може мати вбудований API для файлів,
+                                       // тому ми можемо шукати OBR.file.upload() або подібне.
+                                       // Для прикладу, використаємо OBR.modal.open і припустимо,
+                                       // що він повертає URL.
+            width: 400,
+            height: 300,
+            disableInteraction: false,
+            // Якщо OBR має прямий метод завантаження:
+            // return await OBR.image.upload(); // Приклад, перевірте актуальну документацію OBR
+        });
+
+        // OBR.modal.open зазвичай повертає дані, які передала модалка після закриття
+        // Припускаємо, що модалка повертає URL зображення.
+        if (result && typeof result === 'string') { // Припускаємо, що result - це URL
+            const elements = getSheetInputElements();
+            elements.characterPhotoPreview.src = result;
+            elements.characterPhotoPreview.style.display = 'block';
+            elements.characterPhotoUpload.querySelector('.fa-plus').style.display = 'none';
+            elements.photoSettingsButton.style.display = 'flex'; // Показуємо шестерню
+            saveActiveSheetData();
+            console.log("Photo uploaded and URL set:", result);
+        } else {
+            console.warn("Upload modal did not return a valid URL or was cancelled.");
         }
+    } catch (error) {
+        console.error("Error uploading photo with OBR SDK:", error);
+        alert("Не вдалося завантажити фото. Перевірте консоль для деталей або спробуйте ще раз.");
+    }
+}
 
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(characterSheets));
-        localStorage.setItem('activeSheetIndex', activeSheetIndex.toString());
-        console.log('Лист персонажа видалено. Залишилось листів:', characterSheets.length);
-        loadActiveSheetData();
+// Функція для видалення фото
+function removeCharacterPhoto() {
+    const elements = getSheetInputElements();
+    elements.characterPhotoPreview.src = '';
+    elements.characterPhotoPreview.style.display = 'none';
+    elements.characterPhotoUpload.querySelector('.fa-plus').style.display = 'block';
+    elements.photoSettingsButton.style.display = 'none';
+    elements.photoSettingsDropdown.style.display = 'none'; // Закриваємо випадаюче меню
+    saveActiveSheetData();
+    console.log("Photo removed.");
+}
+
+// Функція для показу/приховування випадаючого меню шестерні
+function togglePhotoSettingsDropdown() {
+    const elements = getSheetInputElements();
+    const dropdown = elements.photoSettingsDropdown;
+    if (dropdown.style.display === 'block') {
+        dropdown.style.display = 'none';
+    } else {
+        dropdown.style.display = 'block';
     }
 }
 
@@ -238,8 +339,11 @@ function deleteCharacterSheetByIndex(indexToDelete) {
 document.addEventListener('DOMContentLoaded', () => {
     const addCharacterButton = document.getElementById('addCharacterButton');
     const deleteCharacterButton = document.getElementById('deleteCharacterButton');
-    const characterPhotoUrlInput = document.getElementById('characterPhotoUrl');
-    const characterPhotoPreview = document.getElementById('characterPhotoPreview');
+    const characterPhotoUploadDiv = document.getElementById('characterPhotoUpload');
+    const photoSettingsButton = document.getElementById('photoSettingsButton');
+    const replacePhotoButton = document.getElementById('replacePhotoButton');
+    const removePhotoButton = document.getElementById('removePhotoButton');
+
 
     if (addCharacterButton) {
         addCharacterButton.addEventListener('click', addCharacterSheet);
@@ -247,19 +351,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (deleteCharacterButton) {
         deleteCharacterButton.addEventListener('click', deleteCharacterSheet);
     }
-    if (characterPhotoUrlInput) {
-        characterPhotoUrlInput.addEventListener('input', () => {
-            const url = characterPhotoUrlInput.value;
-            if (url) {
-                characterPhotoPreview.src = url;
-                characterPhotoPreview.style.display = 'block';
-            } else {
-                characterPhotoPreview.src = '';
-                characterPhotoPreview.style.display = 'none';
+
+    // Обробники для фото
+    if (characterPhotoUploadDiv) {
+        characterPhotoUploadDiv.addEventListener('click', () => {
+            // Клік на будь-яку частину квадрата для завантаження, якщо фото немає
+            const elements = getSheetInputElements();
+            if (!elements.characterPhotoPreview.src || elements.characterPhotoPreview.src === window.location.href + '#') {
+                uploadCharacterPhoto();
             }
-            saveActiveSheetData(); // Зберігаємо URL фото при зміні
         });
     }
+
+    if (photoSettingsButton) {
+        photoSettingsButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Запобігаємо закриттю при кліку на саму шестерню
+            togglePhotoSettingsDropdown();
+        });
+    }
+
+    if (replacePhotoButton) {
+        replacePhotoButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Зупиняємо, щоб не закрити одразу
+            togglePhotoSettingsDropdown(); // Закриваємо меню після вибору
+            uploadCharacterPhoto(); // Завантажуємо нове фото
+        });
+    }
+
+    if (removePhotoButton) {
+        removePhotoButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            togglePhotoSettingsDropdown(); // Закриваємо меню після вибору
+            removeCharacterPhoto(); // Видаляємо фото
+        });
+    }
+
+    // Закриття випадаючого меню, якщо клікнули поза ним
+    document.addEventListener('click', (event) => {
+        const elements = getSheetInputElements();
+        if (elements.photoSettingsDropdown && elements.photoSettingsDropdown.style.display === 'block' &&
+            !elements.photoSettingsButton.contains(event.target)) {
+            elements.photoSettingsDropdown.style.display = 'none';
+        }
+    });
 
 
     // Завантажуємо всі листи з localStorage при старті
@@ -280,7 +414,8 @@ document.addEventListener('DOMContentLoaded', () => {
         addCharacterSheet();
     }
 
-    loadActiveSheetData(); // Завантажуємо та відображаємо активний лист
+    // Завантажуємо та відображаємо активний лист
+    loadActiveSheetData();
 
     // Додаємо слухачів подій до всіх полів для збереження при зміні
     // Важливо: слухачі додаються до елементів, які є частиною DOM на старті
@@ -289,5 +424,23 @@ document.addEventListener('DOMContentLoaded', () => {
     allInputElements.forEach(element => {
         element.addEventListener('input', saveActiveSheetData);
         element.addEventListener('change', saveActiveSheetData);
+    });
+
+    // Модифікація для відображення модифікаторів здібностей
+    const abilityScoreInputs = document.querySelectorAll('.ability .score-input');
+    abilityScoreInputs.forEach(input => {
+        const modifierDiv = input.nextElementSibling; // div з класом 'modifier'
+        const updateModifier = () => {
+            const score = parseInt(input.value);
+            if (!isNaN(score)) {
+                const modifier = Math.floor((score - 10) / 2);
+                modifierDiv.textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
+            } else {
+                modifierDiv.textContent = `(+0)`; // За замовчуванням
+            }
+            saveActiveSheetData(); // Зберігаємо дані при зміні
+        };
+        input.addEventListener('input', updateModifier);
+        updateModifier(); // Викликаємо при завантаженні, щоб встановити початкові модифікатори
     });
 });
