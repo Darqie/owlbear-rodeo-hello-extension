@@ -1,997 +1,268 @@
 <!DOCTYPE html>
-
 <html lang="uk">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Лист Персонажа</title>
-
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <script src="main.js" defer></script>
-
-    <style>
-
-        body {
-
-            font-family: 'Roboto', sans-serif;
-
-            margin: 0;
-
-            padding: 20px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: stretch;
-
-            min-height: 100vh;
-
-            background-color: rgba(30, 34, 49, 0.1);
-
-            color: #e0e0e0;
-
-            font-size: 16px;
-
-            line-height: 1.4;
-
-            backdrop-filter: blur(20px);
-
-            -webkit-backdrop-filter: blur(20px);
-
-            position: relative;
-
-        }
-
-
-
-        .character-controls {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            margin-bottom: 15px;
-
-            gap: 10px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .character-tabs {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 5px;
-
-            flex-grow: 1;
-
-        }
-
-
-
-        .character-tab {
-
-            background-color: rgba(255, 255, 255, 0.1);
-
-            border: 1px solid rgba(255, 255, 255, 0.2);
-
-            border-radius: 5px;
-
-            padding: 5px 10px;
-
-            cursor: pointer;
-
-            font-size: 0.9em;
-
-            transition: background-color 0.2s, border-color 0.2s;
-
-            position: relative;
-
-            display: flex; /* Для вирівнювання тексту і хрестика */
-
-            align-items: center;
-
-        }
-
-
-
-        .character-tab:hover {
-
-            background-color: rgba(255, 255, 255, 0.15);
-
-        }
-
-
-
-        .character-tab.active {
-
-            background-color: #4CAF50;
-
-            border-color: #4CAF50;
-
-            color: white;
-
-            font-weight: bold;
-
-        }
-
-
-
-        .character-tab .close-tab {
-
-            margin-left: 8px;
-
-            color: rgba(255, 255, 255, 0.7);
-
-            cursor: pointer;
-
-            font-weight: bold;
-
-            font-size: 0.9em;
-
-        }
-
-
-
-        .character-tab .close-tab:hover {
-
-            color: #ff4d4d;
-
-        }
-
-
-
-        /* Стилі для кнопок "+" та "-" */
-
-        #addCharacterButton, #deleteCharacterButton {
-
-            background-color: #4CAF50;
-
-            color: white;
-
-            border: none;
-
-            border-radius: 50%;
-
-            width: 30px;
-
-            height: 30px;
-
-            font-size: 20px;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            cursor: pointer;
-
-            transition: background-color 0.2s;
-
-            flex-shrink: 0;
-
-            margin-left: 5px;
-
-            font-weight: bold; /* Для жирнішого "+" */
-
-        }
-
-
-
-        #addCharacterButton:hover {
-
-            background-color: #45a049;
-
-        }
-
-
-
-        #deleteCharacterButton {
-
-            background-color: #f44336; /* Червона для видалення */
-
-            font-size: 24px; /* Трохи більший для "-" */
-
-            line-height: 1; /* Вирівнювання по центру */
-
-            padding-bottom: 2px; /* Коригування позиції "-" */
-
-        }
-
-
-
-        #deleteCharacterButton:hover {
-
-            background-color: #d32f2f;
-
-        }
-
-
-
-        #characterSheetContainer {
-
-            flex-grow: 1;
-
-            display: flex;
-
-            flex-direction: column;
-
-            width: 100%;
-
-            overflow-y: auto;
-
-            padding-right: 5px;
-
-        }
-
-
-
-        .character-sheet {
-
-            display: flex;
-
-            flex-direction: column;
-
-            width: 100%;
-
-        }
-
-
-
-        .block {
-
-            background-color: rgba(255, 255, 255, 0.05);
-
-            border: 1px solid rgba(255, 255, 255, 0.1);
-
-            border-radius: 5px;
-
-            padding: 10px;
-
-            margin-bottom: 10px;
-
-        }
-
-
-
-        .header-block {
-
-            display: flex;
-
-            gap: 10px;
-
-            margin-bottom: 15px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .header-item {
-
-            flex-grow: 1;
-
-            padding: 5px;
-
-            background-color: rgba(255, 255, 255, 0.05);
-
-            border-radius: 3px;
-
-            display: flex;
-
-            flex-direction: column;
-
-        }
-
-
-
-        .header-item label {
-
-            font-size: 0.8em;
-
-            color: #b0b0b0;
-
-            margin-bottom: 3px;
-
-        }
-
-
-
-        .header-item input[type="text"],
-
-        .header-item input[type="number"],
-
-        .header-item select,
-
-        .ability input, .hp-item input {
-
-            width: 100%;
-
-            padding: 5px;
-
-            background-color: rgba(255, 255, 255, 0.1);
-
-            border: 1px solid rgba(255, 255, 255, 0.2);
-
-            border-radius: 3px;
-
-            color: #e0e0e0;
-
-            font-size: 1em;
-
-            box-sizing: border-box;
-
-        }
-
-
-
-        .header-item input[type="text"]:focus,
-
-        .header-item input[type="number"]:focus,
-
-        .header-item select:focus,
-
-        .ability input:focus, .hp-item input:focus {
-
-            outline: none;
-
-            border-color: #4CAF50;
-
-        }
-
-
-
-        /* Стилі для блоку завантаження фото */
-
-        .character-photo-upload {
-
-            width: 120px; /* Розмір квадрата */
-
-            height: 120px;
-
-            background-color: rgba(255, 255, 255, 0.05);
-
-            border: 1px dashed rgba(255, 255, 255, 0.3); /* Пунктирна облямівка */
-
-            border-radius: 5px;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            cursor: pointer;
-
-            position: relative; /* Для позиціонування іконки */
-
-            overflow: hidden; /* Щоб зображення не виходило за межі */
-
-            margin-top: 10px; /* Відступ від попереднього блоку */
-
-            flex-shrink: 0; /* Не дозволяємо стискатися */
-
-            flex-grow: 0;
-
-        }
-
-
-
-        .character-photo-upload .fa-plus {
-
-            font-size: 48px;
-
-            color: rgba(255, 255, 255, 0.4);
-
-        }
-
-
-
-        .character-photo-upload:hover {
-
-            background-color: rgba(255, 255, 255, 0.1);
-
-            border-color: rgba(255, 255, 255, 0.4);
-
-        }
-
-
-
-        .character-photo-upload img {
-
-            width: 100%;
-
-            height: 100%;
-
-            object-fit: cover; /* Обрізаємо зображення, щоб воно заповнювало квадрат */
-
-            display: none; /* Приховуємо за замовчуванням */
-
-        }
-
-
-
-        .photo-settings {
-
-            position: absolute;
-
-            top: 5px;
-
-            right: 5px;
-
-            background-color: rgba(0, 0, 0, 0.6);
-
-            border-radius: 50%;
-
-            width: 25px;
-
-            height: 25px;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            cursor: pointer;
-
-            color: white;
-
-            font-size: 14px;
-
-            display: none; /* Приховано за замовчуванням */
-
-            z-index: 10; /* Щоб була поверх зображення */
-
-        }
-
-
-
-        .photo-settings:hover {
-
-            background-color: rgba(0, 0, 0, 0.8);
-
-        }
-
-
-
-        .photo-settings .dropdown-content {
-
-            position: absolute;
-
-            top: 100%; /* Під кнопкою */
-
-            right: 0;
-
-            background-color: #333;
-
-            min-width: 120px;
-
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
-
-            z-index: 1;
-
-            border-radius: 5px;
-
-            overflow: hidden;
-
-            display: none; /* Приховано за замовчуванням */
-
-        }
-
-
-
-        .photo-settings .dropdown-content button {
-
-            color: white;
-
-            padding: 8px 12px;
-
-            text-decoration: none;
-
-            display: block;
-
-            background: none;
-
-            border: none;
-
-            width: 100%;
-
-            text-align: left;
-
-            cursor: pointer;
-
-            font-size: 0.9em;
-
-        }
-
-
-
-        .photo-settings .dropdown-content button:hover {
-
-            background-color: #555;
-
-        }
-
-
-
-        .ability-scores {
-
-            display: flex;
-
-            gap: 10px;
-
-            margin-bottom: 15px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .ability {
-
-            flex: 1;
-
-            min-width: 80px;
-
-            text-align: center;
-
-            background-color: rgba(255, 255, 255, 0.05);
-
-            border-radius: 3px;
-
-            padding: 5px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-        }
-
-
-
-        .ability div:first-child {
-
-            font-weight: bold;
-
-            margin-bottom: 5px;
-
-        }
-
-        .ability .modifier {
-
-            font-size: 0.9em;
-
-            color: #b0b0b0;
-
-        }
-
-        .ability input.score-input {
-
-            width: calc(100% - 10px);
-
-            margin-top: 5px;
-
-            font-size: 1.1em;
-
-            font-weight: bold;
-
-        }
-
-
-
-        .hp-block {
-
-            display: flex;
-
-            gap: 10px;
-
-            margin-bottom: 15px;
-
-            flex-wrap: wrap;
-
-        }
-
-
-
-        .hp-item {
-
-            flex: 1;
-
-            min-width: 100px;
-
-            text-align: center;
-
-            background-color: rgba(255, 255, 255, 0.05);
-
-            border-radius: 3px;
-
-            padding: 5px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-        }
-
-        .hp-item div:first-child {
-
-            font-weight: bold;
-
-            margin-bottom: 5px;
-
-        }
-
-        .hp-item input {
-
-            font-size: 1.1em;
-
-            font-weight: bold;
-
-            margin-top: 5px;
-
-        }
-
-
-
-        h2 {
-
-            font-size: 1.2em;
-
-            margin-top: 0;
-
-            margin-bottom: 10px;
-
-            color: #fff;
-
-        }
-
-    </style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лист Персонажа</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <script src="main.js" defer></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch; /* Розтягуємо блоки на всю ширину */
+            min-height: 100vh;
+            background-color: rgba(30, 34, 49, 0.1); /* #1E2231 з прозорістю 90% (0.1 непрозорості) */
+            color: #e0e0e0;
+            font-size: 16px; /* Зменшимо базовий розмір шрифту */
+            line-height: 1.4;
+            backdrop-filter: blur(20px); /* Ефект розмиття */
+            -webkit-backdrop-filter: blur(20px); /* Для підтримки в Safari */
+        }
+
+        .block {
+            background-color: rgba(255, 255, 255, 0.05); /* Легкий напівпрозорий фон для блоків */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Легка облямівка */
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .header-block {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* Дозволяє елементам переноситися на новий рядок на малих екранах */
+        }
+
+        .header-item {
+            flex-grow: 1;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            display: flex; /* Додаємо flex для вирівнювання вмісту */
+            flex-direction: column; /* Елементи всередині стовпцем */
+        }
+
+        .header-item label {
+            font-size: 0.8em;
+            color: #b0b0b0;
+            margin-bottom: 3px;
+        }
+
+        .header-item input[type="text"],
+        .header-item select {
+            width: 100%;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.1); /* Напівпрозорий фон для полів */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            color: #e0e0e0; /* Колір тексту в полях */
+            font-size: 1em;
+            box-sizing: border-box; /* Враховує padding та border у загальній ширині */
+        }
+
+        .header-item input[type="text"]:focus,
+        .header-item select:focus {
+            outline: none;
+            border-color: #4CAF50; /* Зелена облямівка при фокусі */
+        }
+
+        .ability-scores {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .ability {
+            flex: 1; /* Рівномірний розподіл ширини */
+            min-width: 80px; /* Мінімальна ширина для колонки здібностей */
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            padding: 5px;
+        }
+
+        .ability div:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .ability div:last-child {
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+
+        .hp-block {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hp-item {
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            padding: 5px;
+        }
+        .hp-item div:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+    </style>
 </head>
-
 <body>
-
-    <div class="character-controls">
-
-        <div class="character-tabs" id="characterTabs">
-
-            </div>
-
-        <button id="addCharacterButton">+</button>
-
-        <button id="deleteCharacterButton">-</button>
-
-    </div>
-
-
-
-    <div id="characterSheetContainer">
-
-        <div class="character-sheet" id="characterSheetTemplate">
-
-            <div class="header-block">
-
-                <div class="header-item">
-
-                    <label for="characterName">Назва Персонажа</label>
-
-                    <input type="text" id="characterName" placeholder="Введіть назву персонажа">
-
-                </div>
-
-                <div class="header-item">
-
-                    <label for="characterClassLevel">Клас & Рівень</label>
-
-                    <input type="text" id="characterClassLevel" placeholder="Введіть клас та рівень">
-
-                </div>
-
-                <div class="header-item">
-
-                    <label for="background">Передісторія</label>
-
-                    <input type="text" id="background" placeholder="Введіть передісторію">
-
-                </div>
-
-                <div class="header-item">
-
-                    <label for="playerName">Ім'я Гравця</label>
-
-                    <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
-
-                </div>
-
-            </div>
-
-
-
-            <div class="header-block">
-
-                <div class="header-item">
-
-                    <label for="characterRace">Раса</label>
-
-                    <select id="characterRace">
-
-                        <option value="">Оберіть расу</option>
-
-                        <option value="human">Людина</option>
-
-                        <option value="elf">Ельф</option>
-
-                        <option value="dwarf">Гном</option>
-
-                        <option value="halfling">Гафлінг</option>
-
-                        <option value="dragonborn">Драконороджений</option>
-
-                        <option value="gnome">Гном</option>
-
-                        <option value="half-elf">Напівельф</option>
-
-                        <option value="half-orc">Напіворк</option>
-
-                        <option value="tiefling">Тіфлінг</option>
-
-                        <option value="aarakocra">Ааракокра</option>
-
-                        <option value="genasi">Генасі</option>
-
-                        <option value="goliath">Голіаф</option>
-
-                        <option value="lizardfolk">Ящер</option>
-
-                        <option value="tabaxi">Табаксі</option>
-
-                        <option value="kenku">Кенку</option>
-
-                        <option value="firbolg">Фірболг</option>
-
-                        <option value="gith">Гіт</option>
-
-                        <option value="yuan-ti">Юань-ті</option>
-
-                        <option value="bugbear">Багбір</option>
-
-                        <option value="goblin">Гоблін</option>
-
-                        <option value="hobgoblin">Хобгоблін</option>
-
-                        <option value="kobold">Кобольд</option>
-
-                        <option value="orc">Орк</option>
-
-                        <option value="grung">Ґрунґ</option>
-
-                        <option value="tortle">Тортл</option>
-
-                        <option value="leonin">Леонін</option>
-
-                        <option value="satyr">Сатир</option>
-
-                        <option value="changeling">Ченджлінг</option>
-
-                        <option value="kalashtar">Калаштар</option>
-
-                        <option value="shifter">Шифтер</option>
-
-                        <option value="warforged">Варфорджд</option>
-
-                        <option value="vedalken">Ведалкен</option>
-
-                        <option value="loxodon">Локсодон</option>
-
-                        <option value="simic-hybrid">Симік-гібрид</option>
-
-                        <option value="centaur">Кентавр</option>
-
-                        <option value="minotaur">Мінотавр</option>
-
-                        <option value="verdan">Вердан</option>
-
-                        <option value="locathah">Локатах</option>
-
-                        <option value="grung">Ґрунґ</option>
-
-                        <option value="owlin">Аулін</option>
-
-                        <option value="plasmoid">Плазмоїд</option>
-
-                        <option value="thri-kreen">Трі-крін</option>
-
-                        <option value="autognome">Автогном</option>
-
-                        <option value="fairy">Фея</option>
-
-                        <option value="harengon">Харенгон</option>
-
-                        <option value="kender">Кендер</option>
-
-                    </select>
-
-                </div>
-
-                <div class="header-item">
-
-                    <label for="alignment">Світогляд</label>
-
-                    <input type="text" id="alignment" placeholder="Введіть світогляд">
-
-                </div>
-
-                <div class="header-item">
-
-                    <label for="experiencePoints">Досвід</label>
-
-                    <input type="number" id="experiencePoints" placeholder="0">
-
-                </div>
-
-            </div>
-
-            <div class="character-photo-upload" id="characterPhotoUpload">
-
-                <i class="fas fa-plus"></i>
-
-                <img id="characterPhotoPreview" src="" alt="Фото персонажа">
-
-                <div class="photo-settings" id="photoSettingsButton">
-
-                    <i class="fas fa-cog"></i>
-
-                    <div class="dropdown-content">
-
-                        <button id="replacePhotoButton">Замінити фото</button>
-
-                        <button id="removePhotoButton">Видалити фото</button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="ability-scores">
-
-                <div class="ability">
-
-                    <div>СИЛА</div>
-
-                    <input type="number" class="score-input" id="strengthScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-                <div class="ability">
-
-                    <div>СПРИТНІСТЬ</div>
-
-                    <input type="number" class="score-input" id="dexterityScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-                <div class="ability">
-
-                    <div>СТАТУРА</div>
-
-                    <input type="number" class="score-input" id="constitutionScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-                <div class="ability">
-
-                    <div>ІНТЕЛЕКТ</div>
-
-                    <input type="number" class="score-input" id="intelligenceScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-                <div class="ability">
-
-                    <div>МУДРІСТЬ</div>
-
-                    <input type="number" class="score-input" id="wisdomScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-                <div class="ability">
-
-                    <div>ХАРИЗМА</div>
-
-                    <input type="number" class="score-input" id="charismaScore" value="10">
-
-                    <div class="modifier">(+0)</div>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="hp-block">
-
-                <div class="hp-item">
-
-                    <div>МАКСИМУМ HP</div>
-
-                    <input type="number" id="maxHp" value="10">
-
-                </div>
-
-                <div class="hp-item">
-
-                    <div>ПОТОЧНІ HP</div>
-
-                    <input type="number" id="currentHp" value="10">
-
-                </div>
-
-                <div class="hp-item">
-
-                    <div>ТИМЧАСОВІ HP</div>
-
-                    <input type="number" id="tempHp" value="0">
-
-                </div>
-
-            </div>
-
-
-
-            <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
-
-            <div class="block"><h2>НАВИЧКИ</h2></div>
-
-            <div class="block"><h2>ЗБРОЯ</h2></div>
-
-            <div class="block"><h2>СПОСОБИ АТАКИ</h2></div>
-
-            <div class="block"><h2>ОСОБЛИВОСТІ ТА РИСИ</h2></div>
-
-            <div class="block"><h2>СНАРЯДЖЕННЯ</h2></div>
-
-            <div class="block"><h2>НОТАТКИ</h2></div>
-
-        </div>
-
-    </div>
+    <div class="header-block">
+        <div class="header-item">
+            <label for="characterName">Назва Персонажа</label>
+            <input type="text" id="characterName" placeholder="Введіть назву персонажа">
+        </div>
+        <div class="header-item">
+            <label for="characterClassLevel">Клас & Рівень</label>
+            <input type="text" id="characterClassLevel" placeholder="Введіть клас та рівень">
+        </div>
+        <div class="header-item">
+            <label for="background">Передісторія</label>
+            <input type="text" id="background" placeholder="Введіть передісторію">
+        </div>
+        <div class="header-item">
+            <label for="playerName">Ім'я Гравця</label>
+            <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
+        </div>
+    </div>
+
+    <div class="header-block">
+        <div class="header-item">
+            <label for="characterRace">Раса</label>
+            <select id="characterRace">
+                <option value="">Оберіть расу</option>
+                <option value="human">Людина</option>
+                <option value="elf">Ельф</option>
+                <option value="dwarf">Гном</option>
+                <option value="halfling">Гафлінг</option>
+                <option value="dragonborn">Драконороджений</option>
+                <option value="gnome">Гном</option>
+                <option value="half-elf">Напівельф</option>
+                <option value="half-orc">Напіворк</option>
+                <option value="tiefling">Тіфлінг</option>
+                <option value="aarakocra">Ааракокра</option>
+                <option value="genasi">Генасі</option>
+                <option value="goliath">Голіаф</option>
+                <option value="lizardfolk">Ящер</option>
+                <option value="tabaxi">Табаксі</option>
+                <option value="kenku">Кенку</option>
+                <option value="firbolg">Фірболг</option>
+                <option value="gith">Гіт</option>
+                <option value="yuan-ti">Юань-ті</option>
+                <option value="bugbear">Багбір</option>
+                <option value="goblin">Гоблін</option>
+                <option value="hobgoblin">Хобгоблін</option>
+                <option value="kobold">Кобольд</option>
+                <option value="orc">Орк</option>
+                <option value="grung">Ґрунґ</option>
+                <option value="tortle">Тортл</option>
+                <option value="leonin">Леонін</option>
+                <option value="satyr">Сатир</option>
+                <option value="changeling">Ченджлінг</option>
+                <option value="kalashtar">Калаштар</option>
+                <option value="shifter">Шифтер</option>
+                <option value="warforged">Варфорджд</option>
+                <option value="vedalken">Ведалкен</option>
+                <option value="loxodon">Локсодон</option>
+                <option value="simic-hybrid">Симік-гібрид</option>
+                <option value="centaur">Кентавр</option>
+                <option value="minotaur">Мінотавр</option>
+                <option value="verdan">Вердан</option>
+                <option value="locathah">Локатах</option>
+                <option value="grung">Ґрунґ</option>
+                <option value="owlin">Аулін</option>
+                <option value="plasmoid">Плазмоїд</option>
+                <option value="thri-kreen">Трі-крін</option>
+                <option value="autognome">Автогном</option>
+                <option value="fairy">Фея</option>
+                <option value="harengon">Харенгон</option>
+                <option value="kender">Кендер</option>
+                <option value="minotaur">Мінотавр</option>
+            </select>
+        </div>
+        <div class="header-item">
+            <label for="alignment">Світогляд</label>
+            <input type="text" id="alignment" placeholder="Введіть світогляд">
+        </div>
+        <div class="header-item">
+            <label for="experiencePoints">Досвід</label>
+            <input type="text" id="experiencePoints" placeholder="0">
+        </div>
+    </div>
+
+    <div class="ability-scores">
+        <div class="ability">
+            <div>СИЛА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>СПРИТНІСТЬ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>СТАТУРА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>ІНТЕЛЕКТ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>МУДРІСТЬ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>ХАРИЗМА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+    </div>
+
+    <div class="hp-block">
+        <div class="hp-item">
+            <div>МАКСИМУМ HP</div>
+            <div></div>
+        </div>
+        <div class="hp-item">
+            <div>ПОТОЧНІ HP</div>
+            <div></div>
+        </div>
+        <div class="hp-item">
+            <div>ТИМЧАСОВІ HP</div>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
+    <div class="block"><h2>НАВИЧКИ</h2></div>
+    <div class="block"><h2>ЗБРОЯ</h2></div>
+    <div class="block"><h2>СПОСОБИ АТАКИ</h2></div>
+    <div class="block"><h2>ОСОБЛИВОСТІ ТА РИСИ</h2></div>
+    <div class="block"><h2>СНАРЯДЖЕННЯ</h2></div>
+    <div class="block"><h2>НОТАТКИ</h2></div>
 
 </body>
-
 </html>
