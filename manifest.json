@@ -1,8 +1,14 @@
 {
-  "name": "Привітання Owlbear",
-  "author": "darqie",
+  "name": "Hello, World!",
   "version": "1.0.0",
   "manifest_version": 1,
-  "description": "Просте розширення для Owlbear Rodeo, яке виводить привітання.",
-  "scripts": ["main.js"]
+  "description": "Моє перше розширення Owlbear Rodeo: Привіт, Світе!",
+  "author": "darqie",
+  "action": {
+    "title": "Hello, World!",
+    "icon": "/icon.svg",
+    "popover": "/",
+    "height": 600,
+    "width": 400
+  }
 }
