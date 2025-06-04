@@ -1,51 +1,172 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Darqie character sheet</title>
-    <meta charset="utf-8" />
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лист Персонажа</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="main.js" defer></script>
     <style>
-      body {
-        font-family: 'Roboto', sans-serif;
-        margin: 0;
-        padding: 20px; /* Залишаємо відступи для тексту */
-        display: flex;
-        flex-direction: column; /* Для кращого розташування елементів по вертикалі */
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh; /* Popover буде займати всю доступну висоту */
-        color: #e0e0e0; /* Колір тексту */
-        font-size: 24px;
-        text-align: center;
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch; /* Розтягуємо блоки на всю ширину */
+            min-height: 100vh;
+            background-color: rgba(30, 34, 49, 0.1); /* #1E2231 з прозорістю 90% (0.1 непрозорості) */
+            color: #e0e0e0;
+            font-size: 16px; /* Зменшимо базовий розмір шрифту */
+            line-height: 1.4;
+            backdrop-filter: blur(20px); /* Ефект розмиття */
+            -webkit-backdrop-filter: blur(20px); /* Для підтримки в Safari */
+        }
 
-        /* ОНОВЛЕНІ СТИЛІ ДЛЯ ФОНУ POPUP: БІЛЬШЕ ПРОЗОРІСТЬ (90%) ТА БІЛЬШЕ РОЗМИТТЯ */
-        background-color: rgba(30, 34, 49, 0.1); /* #1E2231 з прозорістю 90% (0.1 непрозорості) */
-        border-radius: 16px; /* Заокруглені кути */
-        /* backdrop-filter та -webkit-backdrop-filter застосовують розмиття до фону *під* popover */
-        backdrop-filter: blur(20px); /* Ефект розмиття */
-        -webkit-backdrop-filter: blur(20px); /* Для підтримки в Safari */
-      }
+        .block {
+            background-color: rgba(255, 255, 255, 0.05); /* Легкий напівпрозорий фон для блоків */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Легка облямівка */
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
 
-      /* Додамо базові стилі для майбутніх елементів, якщо вони будуть */
-      button {
-          background-color: #4CAF50; /* Зелена кнопка */
-          color: white;
-          padding: 10px 20px;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 16px;
-          margin-top: 20px;
-      }
+        .header-block {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* Дозволяє елементам переноситися на новий рядок на малих екранах */
+        }
 
-      button:hover {
-          background-color: #45a049;
-      }
+        .header-item {
+            flex-grow: 1;
+            padding: 5px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .ability-scores {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .ability {
+            flex: 1; /* Рівномірний розподіл ширини */
+            min-width: 80px; /* Мінімальна ширина для колонки здібностей */
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            padding: 5px;
+        }
+
+        .ability div:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .ability div:last-child {
+            font-size: 0.9em;
+            color: #b0b0b0;
+        }
+
+        .hp-block {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hp-item {
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            padding: 5px;
+        }
+        .hp-item div:first-child {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #fff;
+        }
     </style>
-  </head>
-  <body>
-    <h1>Ой, а хто тут молодець? а я тут молодець!</h1>
-    </body>
+</head>
+<body>
+    <div class="header-block">
+        <div class="header-item">Назва Персонажа</div>
+        <div class="header-item">Клас & Рівень</div>
+        <div class="header-item">Передісторія</div>
+        <div class="header-item">Ім'я Гравця</div>
+    </div>
+
+    <div class="header-block">
+        <div class="header-item">Раса</div>
+        <div class="header-item">Світогляд</div>
+        <div class="header-item">Досвід</div>
+    </div>
+
+    <div class="ability-scores">
+        <div class="ability">
+            <div>СИЛА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>СПРИТНІСТЬ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>СТАТУРА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>ІНТЕЛЕКТ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>МУДРІСТЬ</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+        <div class="ability">
+            <div>ХАРИЗМА</div>
+            <div>10</div>
+            <div>(+0)</div>
+        </div>
+    </div>
+
+    <div class="hp-block">
+        <div class="hp-item">
+            <div>МАКСИМУМ HP</div>
+            <div></div>
+        </div>
+        <div class="hp-item">
+            <div>ПОТОЧНІ HP</div>
+            <div></div>
+        </div>
+        <div class="hp-item">
+            <div>ТИМЧАСОВІ HP</div>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
+    <div class="block"><h2>НАВИЧКИ</h2></div>
+    <div class="block"><h2>ЗБРОЯ</h2></div>
+    <div class="block"><h2>СПОСОБИ АТАКИ</h2></div>
+    <div class="block"><h2>ОСОБЛИВОСТІ ТА РИСИ</h2></div>
+    <div class="block"><h2>СНАРЯДЖЕННЯ</h2></div>
+    <div class="block"><h2>НОТАТКИ</h2></div>
+
+</body>
 </html>
