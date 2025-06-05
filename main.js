@@ -1,3 +1,5 @@
+import OBR from 'https://unpkg.com/@owlbear-rodeo/sdk';
+
 // OBR SDK НЕ використовується, всі взаємодії з Owlbear Rodeo видалено.
 // Зберігання даних відбувається ЛИШЕ у локальному сховищі браузера (localStorage).
 
@@ -149,6 +151,8 @@ function loadActiveSheetData() {
 
     console.log(`Лист "${currentSheet.characterName}" завантажено.`);
 }
+
+const debouncedSaveActiveSheetData = debounce(saveActiveSheetData, DEBOUNCE_DELAY);
 
 // Функція для оновлення випадаючого списку персонажів
 function updateCharacterSelect() {
