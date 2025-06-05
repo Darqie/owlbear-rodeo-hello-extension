@@ -1,21 +1,22 @@
 // main.js
 
-// Функція для обчислення модифікатора характеристик
+// Всі функції, які не залежать від DOM або OBR для їх визначення,
+// можуть бути оголошені тут, у глобальній області видимості.
+// Але їх виклики мають бути всередині initializeExtension().
+
 function calculateModifier(score) {
     return Math.floor((score - 10) / 2);
 }
 
-// Функція для оновлення модифікаторів на основі введених значень характеристик
 function updateModifiers() {
     const abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
     abilities.forEach(ability => {
         const score = parseInt(document.getElementById(`${ability}Score`).value);
         const modifier = calculateModifier(score);
-        document.getElementById(`${ability}modifier`).textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
+        document.getElementById(`${ability}Modifier`).textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
     });
 }
 
-// Функція для оновлення превью фото персонажа
 function updatePhotoPreview(url) {
     const imgElement = document.getElementById('characterPhotoPreview');
     if (url) {
@@ -27,12 +28,12 @@ function updatePhotoPreview(url) {
     }
 }
 
-// Глобальні змінні для зберігання листів персонажів та активного індексу
+// Глобальні змінні, які потребують доступу з різних функцій.
+// Їх ініціалізація або перше використання має бути в initializeExtension.
 let characterSheets = [];
 let activeSheetIndex = 0;
-let characterSelect; // Буде ініціалізовано пізніше в initializeExtension()
+let characterSelect; // Ініціалізується в initializeExtension()
 
-// Функція для збереження даних з форми в об'єкт листа персонажа
 function saveCharacterSheetData(sheet) {
     sheet.name = document.getElementById('characterName').value;
     sheet.classLevel = document.getElementById('characterClassLevel').value;
@@ -56,7 +57,6 @@ function saveCharacterSheetData(sheet) {
     sheet.photoUrl = document.getElementById('characterPhotoUrl').value;
 }
 
-// Функція для завантаження даних для вибраного листа в форму
 function loadCharacterSheet(sheet) {
     document.getElementById('characterName').value = sheet.name || '';
     document.getElementById('characterClassLevel').value = sheet.classLevel || '';
@@ -80,10 +80,9 @@ function loadCharacterSheet(sheet) {
     document.getElementById('characterPhotoUrl').value = sheet.photoUrl || '';
     updatePhotoPreview(sheet.photoUrl);
 
-    updateModifiers(); // Оновлюємо модифікатори після завантаження
+    updateModifiers();
 }
 
-// Функція для оновлення випадаючого списку персонажів
 function updateCharacterSelect() {
     characterSelect.innerHTML = '';
     characterSheets.forEach((sheet, index) => {
@@ -98,6 +97,8 @@ function updateCharacterSelect() {
 // Функція для збереження даних у OBR Metadata
 async function saveObrMetadata() {
     try {
+        // Рядок 235: Цей виклик тепер абсолютно точно має виконуватися
+        // лише після того, як OBR готовий завдяки OBR.onReady() та initializeExtension().
         await OBR.player.setMetadata({
             'darqie.characterSheets': characterSheets,
             'darqie.activeSheetIndex': activeSheetIndex
@@ -109,37 +110,28 @@ async function saveObrMetadata() {
     }
 }
 
-// Функція для додавання нового персонажа
 function addCharacterSheet() {
     const newSheet = {
-        name: '',
-        classLevel: '',
-        background: '',
-        playerName: '',
-        race: '',
-        alignment: '',
-        experiencePoints: 0,
+        name: '', classLevel: '', background: '', playerName: '',
+        race: '', alignment: '', experiencePoints: 0,
         abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
-        hp: { max: 10, current: 10, temp: 0 },
-        photoUrl: ''
+        hp: { max: 10, current: 10, temp: 0 }, photoUrl: ''
     };
     characterSheets.push(newSheet);
     activeSheetIndex = characterSheets.length - 1;
     updateCharacterSelect();
     loadCharacterSheet(newSheet);
-    saveObrMetadata(); // Зберігаємо дані після додавання
+    saveObrMetadata();
 }
 
-// Функція для видалення поточного персонажа
 function deleteCharacterSheet() {
     if (characterSheets.length > 1) {
         characterSheets.splice(activeSheetIndex, 1);
-        activeSheetIndex = Math.max(0, activeSheetIndex - 1); // Залишаємось на першому або попередньому
+        activeSheetIndex = Math.max(0, activeSheetIndex - 1);
         updateCharacterSelect();
         loadCharacterSheet(characterSheets[activeSheetIndex]);
-        saveObrMetadata(); // Зберігаємо після видалення
+        saveObrMetadata();
     } else if (characterSheets.length === 1) {
-        // Якщо залишився один, очистити його, але не видаляти сам об'єкт
         const emptySheet = {
             name: '', classLevel: '', background: '', playerName: '',
             race: '', alignment: '', experiencePoints: 0,
@@ -156,26 +148,22 @@ function deleteCharacterSheet() {
 
 
 // ОСНОВНА ФУНКЦІЯ ІНІЦІАЛІЗАЦІЇ РОЗШИРЕННЯ
-// Вона буде викликана, коли OBR SDK повністю завантажиться та буде готовий.
+// Ця функція викликається тільки після того, як OBR SDK повністю завантажений та готовий.
 async function initializeExtension() {
-    // Ініціалізуємо characterSelect тут, після того як DOM готовий
+    // Ініціалізуємо елементи DOM тут, коли DOM вже гарантовано готовий.
     characterSelect = document.getElementById('characterSelect');
 
-    // Обираємо всі поля вводу для збереження даних
     const inputElements = document.querySelectorAll('#characterSheetContainer input, #characterSheetContainer textarea, #characterSheetContainer select');
-
     inputElements.forEach(input => {
         input.addEventListener('input', () => {
             saveCharacterSheetData(characterSheets[activeSheetIndex]);
-            saveObrMetadata(); // Зберігаємо зміни до OBR metadata
-            // Оновлюємо модифікатори, якщо змінилася характеристика
+            saveObrMetadata();
             if (input.classList.contains('score-input')) {
                 updateModifiers();
             }
         });
     });
 
-    // Обробники подій для кнопок та випадаючого списку
     document.getElementById('addCharacterButton').addEventListener('click', addCharacterSheet);
     document.getElementById('deleteCharacterButton').addEventListener('click', deleteCharacterSheet);
     characterSelect.addEventListener('change', (event) => {
@@ -183,7 +171,6 @@ async function initializeExtension() {
         loadCharacterSheet(characterSheets[activeSheetIndex]);
     });
 
-    // Обробник для оновлення фото
     document.getElementById('characterPhotoUrl').addEventListener('input', (event) => {
         updatePhotoPreview(event.target.value);
     });
@@ -194,22 +181,19 @@ async function initializeExtension() {
         if (metadata && metadata['darqie.characterSheets']) {
             characterSheets = metadata['darqie.characterSheets'];
             activeSheetIndex = metadata['darqie.activeSheetIndex'] || 0;
-            // Перевірка на валідність activeSheetIndex
             if (activeSheetIndex >= characterSheets.length) {
                 activeSheetIndex = characterSheets.length > 0 ? characterSheets.length - 1 : 0;
             }
         } else {
-            // Якщо метаданих немає, викликаємо addCharacterSheet для створення першого листа
+            // Якщо метаданих немає, додаємо перший порожній лист
             addCharacterSheet();
         }
         updateCharacterSelect();
         loadCharacterSheet(characterSheets[activeSheetIndex]);
     } catch (error) {
         console.error("Помилка завантаження даних з OBR Metadata:", error);
-        // Не викликаємо alert() тут, щоб уникнути спаму, якщо це очікувана помилка
-        // alert("Помилка завантаження листів персонажів. Можливо, пошкоджені дані або OBR API недоступний.");
 
-        // Створюємо базовий порожній лист для початку роботи, якщо characterSheets все ще порожній
+        // Якщо помилка завантаження, і characterSheets порожні, ініціалізуємо базовий лист
         if (characterSheets.length === 0) {
             const emptySheet = {
                 name: '', classLevel: '', background: '', playerName: '',
@@ -227,13 +211,10 @@ async function initializeExtension() {
 }
 
 
-// *** ЦЕЙ РЯДОК Є КЛЮЧОВИМ! ***
-// OBR.onReady() гарантує, що функція initializeExtension() буде викликана лише після того,
-// як OBR SDK повністю завантажений та ініціалізований.
-// Це вирішує проблему "OBR is not defined", оскільки ваш код не намагатиметься
-// використовувати OBR до його готовності.
+// *** КЛЮЧОВИЙ МОМЕНТ: OBR.onReady() ***
+// Ця функція гарантує, що initializeExtension() буде викликана лише після того,
+// як Owlbear Rodeo SDK повністю завантажений та готовий.
+// Всі виклики функцій, що залежать від OBR, повинні відбуватися після цього.
 OBR.onReady(() => {
-    // Всі взаємодії з DOM та OBR тепер мають бути всередині або викликатися звідси.
-    // DOMContentLoaded тут вже не потрібен, оскільки OBR.onReady чекає, поки DOM буде готовий.
     initializeExtension();
 });
