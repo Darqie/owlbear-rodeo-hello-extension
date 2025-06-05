@@ -3,76 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Персонаж D&D 5e</title>
+    <title>Лист Персонажа</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script src="main.js" defer></script>
 </head>
 <body>
-    <div id="characterSheetContainer">
-        <div class="header-section">
-            <input type="text" id="characterName" placeholder="Ім'я персонажа">
-            <input type="text" id="characterClassLevel" placeholder="Клас і рівень">
-            <input type="text" id="background" placeholder="Передісторія">
-            <input type="text" id="playerName" placeholder="Ім'я гравця">
-            <input type="text" id="characterRace" placeholder="Раса">
-            <input type="text" id="alignment" placeholder="Світогляд">
-            <input type="number" id="experiencePoints" placeholder="Досвід" value="0">
-        </div>
-
-        <div class="photo-section">
-            <input type="text" id="characterPhotoUrl" placeholder="URL фото персонажа">
-            <img id="characterPhotoPreview" src="" alt="Фото персонажа" style="display: none;">
-        </div>
-
-        <div class="abilities-section">
-            <div class="ability">
-                <label for="strengthScore">Сила</label>
-                <input type="number" id="strengthScore" class="score-input" value="10">
-                <span id="strengthModifier" class="modifier"></span>
-            </div>
-            <div class="ability">
-                <label for="dexterityScore">Спритність</label>
-                <input type="number" id="dexterityScore" class="score-input" value="10">
-                <span id="dexterityModifier" class="modifier"></span>
-            </div>
-            <div class="ability">
-                <label for="constitutionScore">Статура</label>
-                <input type="number" id="constitutionScore" class="score-input" value="10">
-                <span id="constitutionModifier" class="modifier"></span>
-            </div>
-            <div class="ability">
-                <label for="intelligenceScore">Інтелект</label>
-                <input type="number" id="intelligenceScore" class="score-input" value="10">
-                <span id="intelligenceModifier" class="modifier"></span>
-            </div>
-            <div class="ability">
-                <label for="wisdomScore">Мудрість</label>
-                <input type="number" id="wisdomScore" class="score-input" value="10">
-                <span id="wisdomModifier" class="modifier"></span>
-            </div>
-            <div class="ability">
-                <label for="charismaScore">Харизма</label>
-                <input type="number" id="charismaScore" class="score-input" value="10">
-                <span id="charismaModifier" class="modifier"></span>
-            </div>
-        </div>
-
-        <div class="hp-section">
-            <label for="maxHp">Макс. ОЗ</label>
-            <input type="number" id="maxHp" value="10">
-            <label for="currentHp">Поточні ОЗ</label>
-            <input type="number" id="currentHp" value="10">
-            <label for="tempHp">Тимч. ОЗ</label>
-            <input type="number" id="tempHp" value="0">
-        </div>
-
-        <div class="sheet-navigation">
+    <div class="character-controls">
+        <div class="character-tabs">
             <select id="characterSelect"></select>
-            <button id="addCharacterButton">Додати</button>
-            <button id="deleteCharacterButton">Видалити</button>
         </div>
-
+        <button id="addCharacterButton">+</button>
+        <button id="deleteCharacterButton"><i class="fas fa-trash-alt"></i></button>
     </div>
-    
-    <script src="main.js"></script> 
+
+    <div id="characterSheetContainer">
+        <div class="character-sheet" id="characterSheetTemplate" style="display: none;">
+            <div class="header-block">
+                <div class="header-item">
+                    <label for="characterName">Назва Персонажа</label>
+                    <input type="text" id="characterName" placeholder="Введіть назву персонажа">
+                </div>
+                <div class="header-item">
+                    <label for="characterClassLevel">Клас & Рівень</label>
+                    <input type="text" id="characterClassLevel" placeholder="Введіть клас та рівень">
+                </div>
+                <div class="header-item">
+                    <label for="background">Передісторія</label>
+                    <input type="text" id="background" placeholder="Введіть передісторію">
+                </div>
+                <div class="header-item">
+                    <label for="playerName">Ім'я Гравця</label>
+                    <input type="text" id="playerName" placeholder="Введіть ваше ім'я">
+                </div>
+            </div>
+
+            <div class="header-block">
+                <div class="header-item">
+                    <label for="characterRace">Раса</label>
+                    <select id="characterRace">
+                        <option value="">Оберіть расу</option>
+                        <option value="human">Людина</option>
+                        <option value="elf">Ельф</option>
+                        <option value="dwarf">Гном</option>
+                        <option value="halfling">Гафлінг</option>
+                        <option value="dragonborn">Драконороджений</option>
+                        <option value="gnome">Гном</option>
+                        <option value="half-elf">Напівельф</option>
+                        <option value="half-orc">Напіворк</option>
+                        <option value="tiefling">Тіфлінг</option>
+                        <option value="aarakocra">Ааракокра</option>
+                        <option value="genasi">Генасі</option>
+                        <option value="goliath">Голіаф</option>
+                        <option value="lizardfolk">Ящер</option>
+                        <option value="tabaxi">Табаксі</option>
+                        <option value="kenku">Кенку</option>
+                        <option value="firbolg">Фірболг</option>
+                        <option value="gith">Гіт</option>
+                        <option value="yuan-ti">Юань-ті</option>
+                        <option value="bugbear">Багбір</option>
+                        <option value="goblin">Гоблін</option>
+                        <option value="hobgoblin">Хобгоблін</S>
+                        <option value="kobold">Кобольд</option>
+                        <option value="orc">Орк</option>
+                        <option value="grung">Ґрунґ</option>
+                        <option value="tortle">Тортл</option>
+                        <option value="leonin">Леонін</option>
+                        <option value="satyr">Сатир</option>
+                        <option value="changeling">Ченджлінг</option>
+                        <option value="kalashtar">Калаштар</option>
+                        <option value="shifter">Шифтер</option>
+                        <option value="warforged">Варфорджд</option>
+                        <option value="vedalken">Ведалкен</option>
+                        <option value="loxodon">Локсодон</option>
+                        <option value="simic-hybrid">Симік-гібрид</option>
+                        <option value="centaur">Кентавр</option>
+                        <option value="minotaur">Мінотавр</option>
+                        <option value="verdan">Вердан</option>
+                        <option value="locathah">Локатах</option>
+                        <option value="grung">Ґрунґ</option>
+                        <option value="owlin">Аулін</option>
+                        <option value="plasmoid">Плазмоїд</option>
+                        <option value="thri-kreen">Трі-крін</option>
+                        <option value="autognome">Автогном</option>
+                        <option value="fairy">Фея</option>
+                        <option value="harengon">Харенгон</option>
+                        <option value="kender">Кендер</option>
+                    </select>
+                </div>
+                <div class="header-item">
+                    <label for="alignment">Світогляд</label>
+                    <input type="text" id="alignment" placeholder="Введіть світогляд">
+                </div>
+                <div class="header-item">
+                    <label for="experiencePoints">Досвід</label>
+                    <input type="number" id="experiencePoints" placeholder="0">
+                </div>
+                <div class="header-item character-photo-item">
+                    <label for="characterPhotoUrl">Посилання на фото</label>
+                    <input type="text" id="characterPhotoUrl" placeholder="URL зображення">
+                    <img id="characterPhotoPreview" src="" alt="Фото персонажа" style="display: none;">
+                </div>
+            </div>
+
+            <div class="ability-scores">
+                <div class="ability">
+                    <div>СИЛА</div>
+                    <input type="number" class="score-input" id="strengthScore" value="10">
+                    <div class="modifier" id="strengthModifier">(+0)</div>
+                </div>
+                <div class="ability">
+                    <div>СПРИТНІСТЬ</div>
+                    <input type="number" class="score-input" id="dexterityScore" value="10">
+                    <div class="modifier" id="dexterityModifier">(+0)</div>
+                </div>
+                <div class="ability">
+                    <div>СТАТУРА</div>
+                    <input type="number" class="score-input" id="constitutionScore" value="10">
+                    <div class="modifier" id="constitutionModifier">(+0)</div>
+                </div>
+                <div class="ability">
+                    <div>ІНТЕЛЕКТ</div>
+                    <input type="number" class="score-input" id="intelligenceScore" value="10">
+                    <div class="modifier" id="intelligenceModifier">(+0)</div>
+                </div>
+                <div class="ability">
+                    <div>МУДРІСТЬ</div>
+                    <input type="number" class="score-input" id="wisdomScore" value="10">
+                    <div class="modifier" id="wisdomModifier">(+0)</div>
+                </div>
+                <div class="ability">
+                    <div>ХАРИЗМА</div>
+                    <input type="number" class="score-input" id="charismaScore" value="10">
+                    <div class="modifier" id="charismaModifier">(+0)</div>
+                </div>
+            </div>
+
+            <div class="hp-block">
+                <div class="hp-item">
+                    <div>МАКСИМУМ HP</div>
+                    <input type="number" id="maxHp" value="10">
+                </div>
+                <div class="hp-item">
+                    <div>ПОТОЧНІ HP</div>
+                    <input type="number" id="currentHp" value="10">
+                </div>
+                <div class="hp-item">
+                    <div>ТИМЧАСОВІ HP</div>
+                    <input type="number" id="tempHp" value="0">
+                </div>
+            </div>
+
+            <div class="block"><h2>КИДКИ РЯТУНКУ</h2></div>
+            <div class="block"><h2>НАВИЧКИ</h2></div>
+            <div class="block"><h2>ЗБРОЯ</h2></div>
+            <div class="block"><h2>СПОСОБИ АТАКИ</h2></div>
+            <div class="block"><h2>ОСОБЛИВОСТІ ТА РИСИ</h2></div>
+            <div class="block"><h2>СНАРЯДЖЕННЯ</h2></div>
+            <div class="block"><h2>НОТАТКИ</h2></div>
+        </div>
+    </div>
 </body>
 </html>
