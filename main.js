@@ -3,7 +3,6 @@
 // Всі функції, які не залежать від DOM або OBR для їх визначення,
 // можуть бути оголошені тут, у глобальній області видимості.
 // Але їх виклики мають бути всередині initializeExtension().
-debugger;
 function calculateModifier(score) {
     return Math.floor((score - 10) / 2);
 }
