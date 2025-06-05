@@ -1,8 +1,5 @@
 // main.js
 
-// Це важливо: весь ваш код, що взаємодіє з DOM або OBR, повинен бути всередині initializeExtension()
-// або викликатися після OBR.onReady().
-
 // Функція для обчислення модифікатора характеристик
 function calculateModifier(score) {
     return Math.floor((score - 10) / 2);
@@ -14,7 +11,7 @@ function updateModifiers() {
     abilities.forEach(ability => {
         const score = parseInt(document.getElementById(`${ability}Score`).value);
         const modifier = calculateModifier(score);
-        document.getElementById(`${ability}Modifier`).textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
+        document.getElementById(`${ability}modifier`).textContent = `(${modifier >= 0 ? '+' : ''}${modifier})`;
     });
 }
 
@@ -194,7 +191,6 @@ async function initializeExtension() {
     // Завантаження даних з OBR Metadata при запуску розширення
     try {
         const metadata = await OBR.player.getMetadata();
-        // Перевіряємо, чи існують наші метадані
         if (metadata && metadata['darqie.characterSheets']) {
             characterSheets = metadata['darqie.characterSheets'];
             activeSheetIndex = metadata['darqie.activeSheetIndex'] || 0;
@@ -203,17 +199,29 @@ async function initializeExtension() {
                 activeSheetIndex = characterSheets.length > 0 ? characterSheets.length - 1 : 0;
             }
         } else {
-            // Якщо метаданих немає або вони порожні, створюємо перший порожній лист
+            // Якщо метаданих немає, викликаємо addCharacterSheet для створення першого листа
             addCharacterSheet();
         }
         updateCharacterSelect();
         loadCharacterSheet(characterSheets[activeSheetIndex]);
     } catch (error) {
         console.error("Помилка завантаження даних з OBR Metadata:", error);
-        alert("Помилка завантаження листів персонажів. Можливо, пошкоджені дані або OBR API недоступний."); // Це повідомлення з вашого скріншоту
-        // Якщо виникла помилка, переконайтеся, що розширення хоча б відображає порожній лист
+        // Не викликаємо alert() тут, щоб уникнути спаму, якщо це очікувана помилка
+        // alert("Помилка завантаження листів персонажів. Можливо, пошкоджені дані або OBR API недоступний.");
+
+        // Створюємо базовий порожній лист для початку роботи, якщо characterSheets все ще порожній
         if (characterSheets.length === 0) {
-            addCharacterSheet(); // Створити порожній лист, щоб розширення могло працювати
+            const emptySheet = {
+                name: '', classLevel: '', background: '', playerName: '',
+                race: '', alignment: '', experiencePoints: 0,
+                abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
+                hp: { max: 10, current: 10, temp: 0 }, photoUrl: ''
+            };
+            characterSheets.push(emptySheet);
+            activeSheetIndex = 0;
+            updateCharacterSelect();
+            loadCharacterSheet(emptySheet);
+            saveObrMetadata(); // Спроба зберегти порожній лист після ініціалізації
         }
     }
 }
