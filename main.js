@@ -1,8 +1,5 @@
 // main.js
 
-// Додано debugger; для примусової зупинки виконання і діагностики
-debugger; 
-
 // Всі функції, які не залежать від DOM або OBR для їх визначення,
 // можуть бути оголошені тут, у глобальній області видимості.
 // Але їх виклики мають бути всередині initializeExtension().
@@ -100,8 +97,7 @@ function updateCharacterSelect() {
 // Функція для збереження даних у OBR Metadata
 async function saveObrMetadata() {
     try {
-        // Цей рядок викличе помилку, якщо OBR не визначений
-        await OBR.player.setMetadata({ 
+        await OBR.player.setMetadata({
             'darqie.characterSheets': characterSheets,
             'darqie.activeSheetIndex': activeSheetIndex
         });
@@ -179,7 +175,6 @@ async function initializeExtension() {
 
     // Завантаження даних з OBR Metadata при запуску розширення
     try {
-        // Цей рядок викличе помилку, якщо OBR не визначений
         const metadata = await OBR.player.getMetadata();
         if (metadata && metadata['darqie.characterSheets']) {
             characterSheets = metadata['darqie.characterSheets'];
@@ -218,7 +213,6 @@ async function initializeExtension() {
 // Ця функція гарантує, що initializeExtension() буде викликана лише після того,
 // як Owlbear Rodeo SDK повністю завантажений та готовий.
 // Всі виклики функцій, що залежать від OBR, повинні відбуватися після цього.
-// Цей рядок викличе помилку, якщо OBR не визначений.
 OBR.onReady(() => {
     initializeExtension();
 });
