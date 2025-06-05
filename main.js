@@ -1,9 +1,5 @@
 // main.js
 
-// Всі функції, які не залежать від DOM або OBR для їх визначення,
-// можуть бути оголошені тут, у глобальній області видимості.
-// Але їх виклики мають бути всередині initializeExtension().
-
 function calculateModifier(score) {
     return Math.floor((score - 10) / 2);
 }
@@ -28,11 +24,48 @@ function updatePhotoPreview(url) {
     }
 }
 
-// Глобальні змінні, які потребують доступу з різних функцій.
-// Їх ініціалізація або перше використання має бути в initializeExtension.
 let characterSheets = [];
 let activeSheetIndex = 0;
-let characterSelect; // Ініціалізується в initializeExtension()
+let characterSelect;
+
+// Функція для збереження даних у localStorage
+function saveLocalData() {
+    try {
+        localStorage.setItem('darqie.characterSheets', JSON.stringify(characterSheets));
+        localStorage.setItem('darqie.activeSheetIndex', activeSheetIndex.toString());
+        console.log("Дані збережено локально.");
+    } catch (error) {
+        console.error("Помилка збереження даних у localStorage:", error);
+        alert("Помилка збереження даних локально: " + error.message);
+    }
+}
+
+// Функція для завантаження даних з localStorage
+function loadLocalData() {
+    try {
+        const storedSheets = localStorage.getItem('darqie.characterSheets');
+        const storedIndex = localStorage.getItem('darqie.activeSheetIndex');
+
+        if (storedSheets) {
+            characterSheets = JSON.parse(storedSheets);
+            activeSheetIndex = parseInt(storedIndex) || 0;
+            if (activeSheetIndex >= characterSheets.length) {
+                activeSheetIndex = characterSheets.length > 0 ? characterSheets.length - 1 : 0;
+            }
+        } else {
+            // Якщо локальних даних немає, ініціалізуємо перший порожній лист
+            addCharacterSheet(); // Виклик цієї функції також збереже порожній лист
+        }
+    } catch (error) {
+        console.error("Помилка завантаження даних з localStorage:", error);
+        alert("Помилка завантаження даних локально: " + error.message);
+        // Якщо помилка завантаження, і characterSheets порожні, ініціалізуємо базовий лист
+        if (characterSheets.length === 0) {
+            addCharacterSheet();
+        }
+    }
+}
+
 
 function saveCharacterSheetData(sheet) {
     sheet.name = document.getElementById('characterName').value;
@@ -94,19 +127,6 @@ function updateCharacterSelect() {
     characterSelect.value = activeSheetIndex;
 }
 
-// Функція для збереження даних у OBR Metadata
-async function saveObrMetadata() {
-    try {
-        await OBR.player.setMetadata({
-            'darqie.characterSheets': characterSheets,
-            'darqie.activeSheetIndex': activeSheetIndex
-        });
-        console.log("Дані збережено успішно.");
-    } catch (error) {
-        console.error("Помилка збереження даних через OBR Metadata:", error);
-        alert("Помилка збереження даних: " + error.message);
-    }
-}
 
 function addCharacterSheet() {
     const newSheet = {
@@ -119,7 +139,7 @@ function addCharacterSheet() {
     activeSheetIndex = characterSheets.length - 1;
     updateCharacterSelect();
     loadCharacterSheet(newSheet);
-    saveObrMetadata();
+    saveLocalData(); // Зберігаємо локально
 }
 
 function deleteCharacterSheet() {
@@ -128,7 +148,7 @@ function deleteCharacterSheet() {
         activeSheetIndex = Math.max(0, activeSheetIndex - 1);
         updateCharacterSelect();
         loadCharacterSheet(characterSheets[activeSheetIndex]);
-        saveObrMetadata();
+        saveLocalData(); // Зберігаємо локально
     } else if (characterSheets.length === 1) {
         const emptySheet = {
             name: '', classLevel: '', background: '', playerName: '',
@@ -140,22 +160,20 @@ function deleteCharacterSheet() {
         activeSheetIndex = 0;
         updateCharacterSelect();
         loadCharacterSheet(emptySheet);
-        saveObrMetadata();
+        saveLocalData(); // Зберігаємо локально
     }
 }
 
 
-// ОСНОВНА ФУНКЦІЯ ІНІЦІАЛІЗАЦІЇ РОЗШИРЕННЯ
-// Ця функція викликається тільки після того, як OBR SDK повністю завантажений та готовий.
-async function initializeExtension() {
-    // Ініціалізуємо елементи DOM тут, коли DOM вже гарантовано готовий.
+// ОСНОВНА ФУНКЦІЯ ІНІЦІАЛІЗАЦІЇ (тепер без OBR.onReady)
+function initializeExtension() {
     characterSelect = document.getElementById('characterSelect');
 
     const inputElements = document.querySelectorAll('#characterSheetContainer input, #characterSheetContainer textarea, #characterSheetContainer select');
     inputElements.forEach(input => {
         input.addEventListener('input', () => {
             saveCharacterSheetData(characterSheets[activeSheetIndex]);
-            saveObrMetadata();
+            saveLocalData(); // Зберігаємо локально
             if (input.classList.contains('score-input')) {
                 updateModifiers();
             }
@@ -173,46 +191,12 @@ async function initializeExtension() {
         updatePhotoPreview(event.target.value);
     });
 
-    // Завантаження даних з OBR Metadata при запуску розширення
-    try {
-        const metadata = await OBR.player.getMetadata();
-        if (metadata && metadata['darqie.characterSheets']) {
-            characterSheets = metadata['darqie.characterSheets'];
-            activeSheetIndex = metadata['darqie.activeSheetIndex'] || 0;
-            if (activeSheetIndex >= characterSheets.length) {
-                activeSheetIndex = characterSheets.length > 0 ? characterSheets.length - 1 : 0;
-            }
-        } else {
-            // Якщо метаданих немає, додаємо перший порожній лист
-            addCharacterSheet();
-        }
-        updateCharacterSelect();
-        loadCharacterSheet(characterSheets[activeSheetIndex]);
-    } catch (error) {
-        console.error("Помилка завантаження даних з OBR Metadata:", error);
-
-        // Якщо помилка завантаження, і characterSheets порожні, ініціалізуємо базовий лист
-        if (characterSheets.length === 0) {
-            const emptySheet = {
-                name: '', classLevel: '', background: '', playerName: '',
-                race: '', alignment: '', experiencePoints: 0,
-                abilities: { strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10 },
-                hp: { max: 10, current: 10, temp: 0 }, photoUrl: ''
-            };
-            characterSheets.push(emptySheet);
-            activeSheetIndex = 0;
-            updateCharacterSelect();
-            loadCharacterSheet(emptySheet);
-            saveObrMetadata(); // Спроба зберегти порожній лист після ініціалізації
-        }
-    }
+    // Завантаження даних з localStorage при запуску
+    loadLocalData(); 
+    updateCharacterSelect();
+    loadCharacterSheet(characterSheets[activeSheetIndex]);
 }
 
 
-// *** КЛЮЧОВИЙ МОМЕНТ: OBR.onReady() ***
-// Ця функція гарантує, що initializeExtension() буде викликана лише після того,
-// як Owlbear Rodeo SDK повністю завантажений та готовий.
-// Всі виклики функцій, що залежать від OBR, повинні відбуватися після цього.
-OBR.onReady(() => {
-    initializeExtension();
-});
+// Викликаємо функцію ініціалізації після завантаження DOM
+document.addEventListener('DOMContentLoaded', initializeExtension);
